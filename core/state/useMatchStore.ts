@@ -96,10 +96,16 @@ export const useMatchStore = create<MatchStoreState>((set, get) => ({
       }
     ];
 
+    // matchId must only be generated client-side to avoid SSR/client hydration mismatch
+    const matchId =
+      typeof window !== 'undefined'
+        ? `match_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`
+        : 'match_ssr_placeholder';
+
     set({
       gameId,
       gameTitle,
-      matchId: `match_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+      matchId,
       status: 'lobby',
       targetRounds: defaultRounds,
       humanPlayer: savedHuman,

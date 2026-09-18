@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { PlayerRunState, PlatformOption } from '../types';
-import { generateRound } from '../engine/roundGenerator';
+import { generateRound, DEFAULT_INITIAL_ROUND } from '../engine/roundGenerator';
 import { soundManager } from '@/core/audio/soundManager';
 import { PlayerColor } from '@/core/types/player';
 
@@ -23,21 +23,26 @@ export function usePlayerRound({
   numberRange = [1, 10],
   onPlayerFinish,
 }: UsePlayerRoundProps) {
-  const [playerState, setPlayerState] = useState<PlayerRunState>(() => {
-    const initialRound = generateRound(numberRange);
-    return {
-      playerId,
-      name,
-      isBot: false,
-      color,
-      currentRound: initialRound,
-      correctCount: 0,
-      wrongCount: 0,
-      status: 'idle',
-      currentPlatformIndex: null, // Starts on base leaf
-      targetPlatformIndex: undefined,
-    };
-  });
+  const [playerState, setPlayerState] = useState<PlayerRunState>(() => ({
+    playerId,
+    name,
+    isBot: false,
+    color,
+    currentRound: DEFAULT_INITIAL_ROUND,
+    correctCount: 0,
+    wrongCount: 0,
+    status: 'idle',
+    currentPlatformIndex: null, // Starts on base leaf
+    targetPlatformIndex: undefined,
+  }));
+
+  // On client mount, randomize the initial round
+  useEffect(() => {
+    setPlayerState((prev) => ({
+      ...prev,
+      currentRound: generateRound(numberRange),
+    }));
+  }, []);
 
   const [activeSplashIndex, setActiveSplashIndex] = useState<number | null>(null);
   const isHandlingRef = useRef(false);

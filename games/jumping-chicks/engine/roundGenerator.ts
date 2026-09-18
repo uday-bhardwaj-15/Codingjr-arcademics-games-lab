@@ -1,6 +1,16 @@
 import { RoundState, PlatformOption } from '../types';
 import { randomInt, shuffleArray } from '@/core/utils/random';
 
+export const DEFAULT_INITIAL_ROUND: RoundState = {
+  targetNumber: 4,
+  options: [
+    { id: 'platform-0', count: 2, isCorrect: false },
+    { id: 'platform-1', count: 4, isCorrect: true },
+    { id: 'platform-2', count: 6, isCorrect: false },
+    { id: 'platform-3', count: 8, isCorrect: false }
+  ]
+};
+
 export function generateRound(
   range: [number, number] = [1, 10],
   previousTarget?: number
@@ -59,7 +69,8 @@ export function generateRound(
   const options: PlatformOption[] = shuffledOptions.map((opt: { count: number; isCorrect: boolean }, idx: number) => ({
     id: `platform-${idx}`,
     count: opt.count,
-    isCorrect: opt.isCorrect
+    isCorrect: opt.isCorrect,
+    label: `${opt.count} Leaves`
   }));
 
   return {
