@@ -1,26 +1,133 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fbf7dc;
+  --foreground: #1e293b;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-geist-sans, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* 1. Single Bounce on Load (Runs exactly once, never loops) */
+@keyframes chickSingleBounce {
+  0% {
+    transform: translateY(0px) scale(1, 1);
+  }
+  35% {
+    transform: translateY(-24px) scale(1.08, 1.12);
+  }
+  70% {
+    transform: translateY(2px) scale(1.05, 0.95);
+  }
+  100% {
+    transform: translateY(0px) scale(1, 1);
+  }
+}
+
+/* Chick Jump Arc */
+@keyframes chickHopArc {
+  0% {
+    transform: translateY(0px) scale(1, 1);
+  }
+  45% {
+    transform: translateY(-60px) scale(1.18, 1.15);
+  }
+  80% {
+    transform: translateY(-8px) scale(0.95, 1.05);
+  }
+  100% {
+    transform: translateY(0px) scale(1, 1);
+  }
+}
+
+/* Fall / Splash into water */
+@keyframes chickFallSplash {
+  0% {
+    transform: translateY(0px) scale(1);
+    opacity: 1;
+  }
+  40% {
+    transform: translateY(-15px) rotate(-10deg) scale(1.1);
+  }
+  80% {
+    transform: translateY(25px) rotate(15deg) scale(0.7);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(40px) scale(0.3);
+    opacity: 0;
+  }
+}
+
+/* Celebrate Bounce */
+@keyframes chickCelebrateLoop {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-16px) rotate(-6deg);
+  }
+  75% {
+    transform: translateY(-16px) rotate(6deg);
+  }
+}
+
+/* Splash Rings */
+@keyframes splashRing1 {
+  0% {
+    transform: scale(0.3);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+@keyframes splashRing2 {
+  0% {
+    transform: scale(0.2);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(2.3);
+    opacity: 0;
+  }
+}
+
+.animate-chick-idle {
+  /* Runs once on page load, never loops */
+  animation: chickSingleBounce 0.65s cubic-bezier(0.2, 0.9, 0.3, 1) 1 forwards;
+}
+
+.animate-chick-jump {
+  animation: chickHopArc 0.42s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+}
+
+.animate-chick-fall {
+  animation: chickFallSplash 0.65s ease-in forwards;
+}
+
+.animate-chick-celebrate {
+  animation: chickCelebrateLoop 0.8s ease-in-out infinite;
+}
+
+.animate-splash-ring-1 {
+  animation: splashRing1 0.7s ease-out forwards;
+}
+
+.animate-splash-ring-2 {
+  animation: splashRing2 0.85s ease-out forwards 0.1s;
 }
