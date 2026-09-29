@@ -20,6 +20,14 @@ const AlienAdditionGame = dynamic(
   { ssr: false }
 );
 
+const IslandChaseGame = dynamic(
+  () =>
+    import('@/games/island-chase/IslandChaseGame').then(
+      (mod) => mod.IslandChaseGame
+    ),
+  { ssr: false }
+);
+
 export default function GamePlayPage() {
   const params = useParams();
   const router = useRouter();
@@ -31,6 +39,10 @@ export default function GamePlayPage() {
 
   if (gameId === 'alien-addition') {
     return <AlienAdditionGame />;
+  }
+
+  if (gameId === 'island-chase') {
+    return <IslandChaseGame />;
   }
 
   return (

@@ -6,6 +6,7 @@ import confetti from 'canvas-confetti';
 import { MatchResult, PlayerMatchScore } from '../../types/match';
 import { soundManager } from '@/core/audio/soundManager';
 import { Chick } from '@/games/jumping-chicks/components/Chick';
+import { JetSkiAvatar } from '@/games/island-chase/components/JetSkiAvatar';
 import { Maximize2, Printer } from 'lucide-react';
 
 interface LeaderboardViewProps {
@@ -66,6 +67,8 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ result, onPlay
 
   const formatSeconds = (ms: number) => (ms / 1000).toFixed(2) + ' sec';
 
+  const isJetSkiGame = result.gameId === 'island-chase';
+
   // Badge icons for 1st, 2nd, 3rd, 4th
   const renderRankBadge = (rank: number) => {
     if (rank === 1) {
@@ -119,7 +122,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ result, onPlay
               {result.gameTitle}
             </h1>
             <p className="text-xs sm:text-sm text-[#c2580b]/90 font-medium">
-              Math Games, Counting Games
+              Math Games, {isJetSkiGame ? 'Subtraction Games' : 'Counting Games'}
             </p>
           </div>
 
@@ -189,7 +192,11 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ result, onPlay
                     {/* Avatar */}
                     <div className="flex items-center gap-3">
                       <div className="transform-gpu scale-75">
-                        <Chick color={p.color} facing="front" size="sm" showShadow={false} />
+                        {isJetSkiGame ? (
+                          <JetSkiAvatar color={p.color} size="sm" />
+                        ) : (
+                          <Chick color={p.color} facing="front" size="sm" showShadow={false} />
+                        )}
                       </div>
 
                       {/* Player Name */}

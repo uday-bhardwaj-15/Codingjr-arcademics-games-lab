@@ -48,7 +48,8 @@ export default function ArcadeHub() {
     // Calculate aggregated stats across games
     const jumpingChicksHistory = ArcadeStorage.getLeaderboard('jumping-chicks');
     const alienAdditionHistory = ArcadeStorage.getLeaderboard('alien-addition');
-    const allMatches = [...jumpingChicksHistory, ...alienAdditionHistory];
+    const islandChaseHistory = ArcadeStorage.getLeaderboard('island-chase');
+    const allMatches = [...jumpingChicksHistory, ...alienAdditionHistory, ...islandChaseHistory];
 
     const wins = allMatches.filter((m) => {
       const humanScore = m.players?.find((p) => !p.isBot);
@@ -318,7 +319,9 @@ export default function ArcadeHub() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
                 {group.games.map((game) => {
                   const isPlayable =
-                    game.id === 'jumping-chicks' || game.id === 'alien-addition';
+                    game.id === 'jumping-chicks' ||
+                    game.id === 'alien-addition' ||
+                    game.id === 'island-chase';
 
                   return (
                     <div

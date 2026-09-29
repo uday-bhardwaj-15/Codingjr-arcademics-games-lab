@@ -6,6 +6,7 @@ import { useMatchStore } from '../../state/useMatchStore';
 import { GameManifest } from '../../types/match';
 import { soundManager } from '@/core/audio/soundManager';
 import { Chick } from '@/games/jumping-chicks/components/Chick';
+import { JetSkiAvatar } from '@/games/island-chase/components/JetSkiAvatar';
 import { Maximize2, Play } from 'lucide-react';
 
 interface LobbyViewProps {
@@ -148,6 +149,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({ manifest }) => {
             {players.map((p, idx) => {
               const isHuman = !p.isBot;
               const displayName = isHuman ? playerName : `Computer ${idx + 1}`;
+              const isJetSki = manifest.id === 'island-chase';
 
               return (
                 <div
@@ -159,13 +161,33 @@ export const LobbyView: React.FC<LobbyViewProps> = ({ manifest }) => {
                   }`}
                   style={{ minHeight: '260px' }}
                 >
+                  {/* Host Ribbon Badge for Human Player */}
+                  {isHuman && (
+                    <div className="absolute top-4 left-4 flex flex-col items-center z-10 select-none">
+                      <div className="w-6 h-12 bg-red-800 border border-red-950 flex flex-col items-center justify-between py-1 shadow-md relative">
+                        <span className="text-[10px] text-amber-300">★</span>
+                        <div className="absolute -bottom-2.5 left-0 right-0 h-3 bg-red-800 [clip-path:polygon(0_0,100%_0,50%_100%)] border-b border-red-950" />
+                      </div>
+                      <div className="absolute top-2 w-8 h-8 rounded-full bg-gradient-to-b from-amber-300 to-amber-500 border border-amber-700 shadow-md flex items-center justify-center text-amber-950 text-base font-black">
+                        ★
+                      </div>
+                    </div>
+                  )}
+
                   {/* Avatar Sprite */}
                   <div className="transform-gpu transition-transform hover:scale-105">
-                    <Chick
-                      color={p.color}
-                      facing="front"
-                      size="lg"
-                    />
+                    {isJetSki ? (
+                      <JetSkiAvatar
+                        color={p.color}
+                        size="lg"
+                      />
+                    ) : (
+                      <Chick
+                        color={p.color}
+                        facing="front"
+                        size="lg"
+                      />
+                    )}
                   </div>
 
                   {/* Player Name Tag underneath */}
