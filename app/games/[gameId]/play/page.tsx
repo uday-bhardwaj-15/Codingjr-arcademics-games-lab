@@ -1,8 +1,24 @@
 'use client';
 
 import React from 'react';
+import dynamic from 'next/dynamic';
 import { useParams, useRouter } from 'next/navigation';
-import { JumpingChicksGame } from '@/games/jumping-chicks/components/JumpingChicksGame';
+
+const JumpingChicksGame = dynamic(
+  () =>
+    import('@/games/jumping-chicks/components/JumpingChicksGame').then(
+      (mod) => mod.JumpingChicksGame
+    ),
+  { ssr: false }
+);
+
+const AlienAdditionGame = dynamic(
+  () =>
+    import('@/games/alien-addition/AlienAdditionGame').then(
+      (mod) => mod.AlienAdditionGame
+    ),
+  { ssr: false }
+);
 
 export default function GamePlayPage() {
   const params = useParams();
@@ -11,6 +27,10 @@ export default function GamePlayPage() {
 
   if (gameId === 'jumping-chicks') {
     return <JumpingChicksGame />;
+  }
+
+  if (gameId === 'alien-addition') {
+    return <AlienAdditionGame />;
   }
 
   return (

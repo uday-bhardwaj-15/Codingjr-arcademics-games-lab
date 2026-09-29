@@ -8,6 +8,7 @@ export const jumpingChicksManifest: GameManifest = {
   thumbnail: '/assets/thumbnails/jumping-chicks.png',
   badge: 'Multiplayer Arcade Race',
   category: 'Counting & Math',
+  subject: 'counting',
   gradeLevel: 'K - Grade 2',
   minPlayers: 4,
   maxPlayers: 4,

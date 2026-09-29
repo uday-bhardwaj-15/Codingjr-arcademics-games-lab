@@ -1,9 +1,18 @@
 'use client';
 
 import React from 'react';
+import dynamic from 'next/dynamic';
 import { useParams, useRouter } from 'next/navigation';
 import { getGameManifest } from '@/lib/gameRegistry';
 import { LobbyView } from '@/core/components/Lobby/LobbyView';
+
+const AlienAdditionGame = dynamic(
+  () =>
+    import('@/games/alien-addition/AlienAdditionGame').then(
+      (mod) => mod.AlienAdditionGame
+    ),
+  { ssr: false }
+);
 
 export default function GameLobbyPage() {
   const params = useParams();
@@ -25,6 +34,11 @@ export default function GameLobbyPage() {
         </button>
       </div>
     );
+  }
+
+  // Solo mode games run directly in one unified screen flow (Title -> Name -> Instructions -> Options -> Play -> Results)
+  if (manifest.mode === 'solo' || gameId === 'alien-addition') {
+    return <AlienAdditionGame />;
   }
 
   return <LobbyView manifest={manifest} />;

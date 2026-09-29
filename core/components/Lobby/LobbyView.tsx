@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMatchStore } from '../../state/useMatchStore';
 import { GameManifest } from '../../types/match';
-import { soundManager } from '../../audio/soundManager';
+import { soundManager } from '@/core/audio/soundManager';
 import { Chick } from '@/games/jumping-chicks/components/Chick';
 import { Maximize2, Play } from 'lucide-react';
 
@@ -70,7 +70,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({ manifest }) => {
               {manifest.title}
             </h1>
             <p className="text-xs sm:text-sm text-[#c2580b]/90 font-medium">
-              Math Games, Counting Games
+              Math Games, {manifest.category || 'Arcade Games'}
             </p>
           </div>
 
@@ -84,8 +84,8 @@ export const LobbyView: React.FC<LobbyViewProps> = ({ manifest }) => {
           </button>
         </div>
 
-        {/* Main Arcade Frame (Teal cyan background matching Screenshot 1) */}
-        <div className="relative w-full aspect-[16/9] min-h-[460px] bg-[#56e2ca] rounded-none sm:rounded-sm shadow-xl flex flex-col justify-between overflow-hidden border border-teal-400">
+        {/* Main Arcade Frame (Teal cyan / Water background) */}
+        <div className="relative w-full aspect-[16/9] min-h-[460px] bg-[#56e2ca] border-teal-400 rounded-none sm:rounded-sm shadow-xl flex flex-col justify-between overflow-hidden border">
           {/* Top Bar inside Canvas */}
           <div className="w-full flex items-center justify-between pl-6 sm:pl-8">
             {/* Left: Player Game Title (e.g. "Player852's Game") */}
@@ -143,7 +143,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({ manifest }) => {
             </div>
           </div>
 
-          {/* 4 Player Avatars Row (Side-by-side on teal background) */}
+          {/* 4 Player Avatars Row (Side-by-side) */}
           <div className="flex-1 w-full grid grid-cols-4 items-end pb-8 sm:pb-12 px-4 sm:px-8 gap-3 sm:gap-6">
             {players.map((p, idx) => {
               const isHuman = !p.isBot;
@@ -159,7 +159,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({ manifest }) => {
                   }`}
                   style={{ minHeight: '260px' }}
                 >
-                  {/* Front-facing Chick */}
+                  {/* Avatar Sprite */}
                   <div className="transform-gpu transition-transform hover:scale-105">
                     <Chick
                       color={p.color}

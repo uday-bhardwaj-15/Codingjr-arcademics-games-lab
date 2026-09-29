@@ -1,19 +1,20 @@
 'use client';
 
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import confetti from 'canvas-confetti';
 import { MatchResult, PlayerMatchScore } from '../../types/match';
-import { soundManager } from '../../audio/soundManager';
+import { soundManager } from '@/core/audio/soundManager';
 import { Chick } from '@/games/jumping-chicks/components/Chick';
 import { Maximize2, Printer } from 'lucide-react';
 
 interface LeaderboardViewProps {
   result: MatchResult;
   onPlayAgain?: () => void;
+  sidePanel?: React.ReactNode;
 }
 
-export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ result, onPlayAgain }) => {
+export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ result, onPlayAgain, sidePanel }) => {
   const router = useRouter();
 
   useEffect(() => {
@@ -111,7 +112,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ result, onPlay
   return (
     <div className="min-h-screen w-full bg-[#fbf7dc] text-slate-800 p-3 sm:p-6 flex flex-col items-center justify-center font-sans select-none">
       <div className="w-full max-w-5xl space-y-2">
-        {/* Top Header Bar (Matches Screenshot 2) */}
+        {/* Top Header Bar */}
         <div className="flex items-center justify-between px-2">
           <div>
             <h1 className="text-2xl sm:text-3xl font-normal text-[#c2580b] tracking-tight">
@@ -132,9 +133,9 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ result, onPlay
           </button>
         </div>
 
-        {/* Main Results Canvas (Split View matching Screenshot 2) */}
-        <div className="relative w-full aspect-[16/9] min-h-[460px] bg-[#56e2ca] rounded-none sm:rounded-sm shadow-xl flex flex-row overflow-hidden border border-teal-400">
-          {/* Left Teal Column: Results & Ranked Players List */}
+        {/* Main Results Canvas */}
+        <div className="relative w-full aspect-[16/9] min-h-[460px] bg-[#56e2ca] border-teal-400 rounded-none sm:rounded-sm shadow-xl flex flex-row overflow-hidden border">
+          {/* Left Column: Results & Ranked Players List */}
           <div className="w-[54%] h-full p-4 sm:p-6 flex flex-col justify-between">
             {/* Top Results Header */}
             <div className="flex items-center justify-between">
@@ -155,13 +156,13 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ result, onPlay
             {/* 4 Ranked Player Rows */}
             <div className="space-y-2.5 my-auto">
               {sortedPlayers.map((p: PlayerMatchScore) => {
-                const isHuman = !p.isBot;
+                const isHumanPlayer = !p.isBot;
 
                 return (
                   <div
                     key={p.playerId}
                     className={`flex items-center justify-between px-3 py-1.5 rounded-none transition-all ${
-                      isHuman
+                      isHumanPlayer
                         ? 'bg-white/30 ring-1 ring-white/50 shadow-inner'
                         : 'hover:bg-white/10'
                     }`}
@@ -179,13 +180,13 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ result, onPlay
                             {p.rank === 1 ? '1st:' : p.rank === 2 ? '2nd:' : '3rd:'}
                           </span>
                         )}
-                        <span className="text-xs sm:text-sm font-black text-[#e11d48]">
+                        <span className="text-xs sm:text-sm font-black text-[#F03C6E]">
                           {p.finishTimeMs > 0 ? formatSeconds(p.finishTimeMs) : '--.-- sec'}
                         </span>
                       </div>
                     </div>
 
-                    {/* Chick Avatar */}
+                    {/* Avatar */}
                     <div className="flex items-center gap-3">
                       <div className="transform-gpu scale-75">
                         <Chick color={p.color} facing="front" size="sm" showShadow={false} />
@@ -202,36 +203,42 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ result, onPlay
             </div>
           </div>
 
-          {/* Right Dark Slate-Teal Column: Accuracy, Rate, Missed Questions, Buttons */}
-          <div className="w-[46%] h-full bg-[#265952] p-5 sm:p-8 flex flex-col justify-between text-white border-l-2 border-teal-600/60">
-            {/* Top Stats Bar */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between text-sm sm:text-base font-extrabold border-b border-teal-600/70 pb-3">
-                <div>
-                  <span className="text-white/80">Accuracy: </span>
-                  <span className="text-white font-black text-lg">{humanAccuracy}%</span>
+          {/* Right Column: Accuracy, Rate, Missed Questions, Buttons */}
+          <div className="w-[46%] h-full bg-[#265952] border-teal-600/60 p-5 sm:p-8 flex flex-col justify-between text-white border-l-2">
+            {sidePanel ? (
+              sidePanel
+            ) : (
+              /* Default Stats & Missed Questions */
+              <div className="space-y-3">
+                <div className="flex items-center justify-between text-sm sm:text-base font-extrabold border-b border-white/20 pb-3">
+                  <div>
+                    <span className="text-white/80">Accuracy: </span>
+                    <span className="text-white font-black text-lg">{humanAccuracy}%</span>
+                  </div>
+                  <div>
+                    <span className="text-white/80">Rate: </span>
+                    <span className="text-white font-black text-lg">{humanRate}/min</span>
+                  </div>
                 </div>
-                <div>
-                  <span className="text-white/80">Rate: </span>
-                  <span className="text-white font-black text-lg">{humanRate}/min</span>
-                </div>
-              </div>
 
-              {/* Missed Questions Section */}
-              <div className="pt-2">
-                <h3 className="text-xs sm:text-sm font-bold text-white/90">Missed Questions</h3>
-                <div className="mt-2 text-xs text-white/70">
-                  {human.wrongCount === 0 ? (
-                    <span className="text-emerald-300 font-bold">None! Perfect Hop Race! 🎉</span>
-                  ) : (
-                    <span>{human.wrongCount} wrong lily pad hops</span>
-                  )}
+                {/* Missed Questions Section */}
+                <div className="pt-2">
+                  <h3 className="text-xs sm:text-sm font-bold text-white/90 mb-1">
+                    Missed Questions
+                  </h3>
+                  <div className="mt-2 text-xs text-white/70">
+                    {human.wrongCount === 0 ? (
+                      <span className="text-emerald-300 font-bold">None! Perfect Hop Race! 🎉</span>
+                    ) : (
+                      <span>{human.wrongCount} wrong lily pad hops</span>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Bottom Actions: Orange Angled PLAY AGAIN + Dark END GAME */}
-            <div className="flex items-stretch gap-2 pt-4 border-t border-teal-600/70">
+            <div className="flex items-stretch gap-2 pt-4 border-t border-white/20">
               <button
                 onClick={handlePlayAgain}
                 className="flex-1 py-3 bg-[#ff9a00] hover:bg-[#ffaa22] active:scale-95 text-white font-black italic text-base sm:text-xl shadow-md transition-transform cursor-pointer border-l border-amber-600 flex items-center justify-center"
@@ -246,7 +253,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({ result, onPlay
 
               <button
                 onClick={handleEndGame}
-                className="px-5 py-3 bg-[#182a27] hover:bg-[#203a36] text-white font-black text-xs sm:text-sm tracking-wider uppercase flex items-center justify-center transition-colors cursor-pointer"
+                className="px-5 py-3 bg-[#111820] hover:bg-[#1a232e] text-white font-black text-xs sm:text-sm tracking-wider uppercase flex items-center justify-center transition-colors cursor-pointer"
               >
                 END GAME
               </button>

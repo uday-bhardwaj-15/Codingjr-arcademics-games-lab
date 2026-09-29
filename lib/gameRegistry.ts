@@ -1,9 +1,10 @@
 import { GameManifest } from '../core/types/match';
 import { jumpingChicksManifest } from '../games/jumping-chicks/manifest';
+import { alienAdditionManifest } from '../games/alien-addition/manifest';
 
 export const gameRegistry: GameManifest[] = [
   jumpingChicksManifest,
-  // Game #2, #3 can be registered here:
+  alienAdditionManifest,
   {
     id: 'memory-match',
     title: 'Memory Match Safari',
@@ -12,6 +13,7 @@ export const gameRegistry: GameManifest[] = [
     thumbnail: '/assets/thumbnails/memory-match.png',
     badge: 'Coming Soon',
     category: 'Memory & Focus',
+    subject: 'subtraction',
     gradeLevel: 'Grade 1 - 4',
     minPlayers: 4,
     maxPlayers: 4,
@@ -25,11 +27,12 @@ export const gameRegistry: GameManifest[] = [
   {
     id: 'math-racer',
     title: 'Math Sprint Turbo',
-    subtitle: 'High-Speed Addition & Subtraction',
+    subtitle: 'High-Speed Multiplication',
     description: 'Solve arithmetic equations to turbocharge your race kart to the finish line!',
     thumbnail: '/assets/thumbnails/math-racer.png',
     badge: 'Coming Soon',
-    category: 'Speed Arithmetic',
+    category: 'Speed Multiplication',
+    subject: 'multiplication',
     gradeLevel: 'Grade 2 - 5',
     minPlayers: 4,
     maxPlayers: 4,

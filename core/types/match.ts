@@ -29,6 +29,8 @@ export interface GameManifest {
   thumbnail: string;
   badge: string;
   category: string;
+  subject: 'counting' | 'addition' | string;
+  mode?: 'solo' | 'versus';
   gradeLevel: string;
   minPlayers: number;
   maxPlayers: number;
@@ -40,3 +42,4 @@ export interface GameManifest {
   supportedRounds?: number[];
   defaultRounds?: number;
 }
+

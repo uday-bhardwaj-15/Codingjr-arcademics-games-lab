@@ -17,6 +17,8 @@ export const metadata: Metadata = {
   description: 'Play Jumping Chicks and multiplayer educational arcade games. Race with 3 bots in continuous counting and math challenges!',
 };
 
+import { NavBar } from '@/core/components/NavBar';
+
 export default function RootLayout({
   children,
 }: {
@@ -27,8 +29,11 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-slate-950 text-white font-sans">
-        {children}
+      <body className="min-h-full flex flex-col bg-[#fbf7dc] text-slate-900 font-sans">
+        <NavBar />
+        <div className="flex-1 flex flex-col">
+          {children}
+        </div>
       </body>
     </html>
   );
