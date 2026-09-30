@@ -36,6 +36,14 @@ const SpaceRaceGame = dynamic(
   { ssr: false }
 );
 
+const DragRaceGame = dynamic(
+  () =>
+    import('@/games/drag-race/DragRaceGame').then(
+      (mod) => mod.DragRaceGame
+    ),
+  { ssr: false }
+);
+
 export default function GamePlayPage() {
   const params = useParams();
   const router = useRouter();
@@ -55,6 +63,10 @@ export default function GamePlayPage() {
 
   if (gameId === 'space-race') {
     return <SpaceRaceGame />;
+  }
+
+  if (gameId === 'drag-race') {
+    return <DragRaceGame />;
   }
 
   return (

@@ -8,6 +8,7 @@
 | `alien-addition` | Alien Addition | Addition | Solo (6-Stage Timed Shooter) | Done v1.4 |
 | `island-chase` | Island Chase Subtraction | Subtraction | Versus (1 Human + 3 Bots) | Done v1.2 |
 | `space-race` | Space Race Multiplication | Multiplication | Versus (1 Human + 3 Bots) | Done v1.2 |
+| `drag-race` | Drag Race Division | Division | Versus (1 Human + 3 Bots) | Done v1.0 |
 
 ---
 
@@ -29,14 +30,14 @@ src/
 │   ├── jumping-chicks/
 │   ├── alien-addition/
 │   ├── island-chase/
-│   └── space-race/
+│   ├── space-race/
+│   └── drag-race/
 │       ├── manifest.ts
-│       ├── SpaceRaceGame.tsx
+│       ├── DragRaceGame.tsx
 │       ├── constants.ts
 │       ├── types.ts
-│       ├── engine/             # raceRules, raceMachine, raceClock, laps, answerArrows, questionGenerator, botBrain, resultStats, scenery
-│       │   └── __tests__/      # runTests.mjs (Unit, Polar Orbit, Blip Schedule, Phase Machine, and 1000-Race Simulation)
-│       └── components/         # SpaceShipAvatar, SpaceShip, AnswerArrow, Gate, LapRing, SpaceWorld, CountdownCard, ResultsScreen, FinishConfetti
+│       ├── engine/             # questionGenerator, __tests__
+│       └── components/         # DragCar, DragCarAvatar, DragTrack, DragTree, RaceHUD, DistanceBar, TitleScreen, NameScreen, LobbyScreen, ResultsScreen
 └── lib/
     ├── gameRegistry.ts
     └── subjects.ts
@@ -80,6 +81,7 @@ src/
 
 ## 4. Change Log
 
+- **Demolition Division v1.0:** Division solo desert shooter game added. 6-stage 60s timed rounds, dual tank visual variants (red front-facing & yellow angled), telegraphed enemy shells with stun effect, ray-cast aiming and firing, barrel rotation with arrow keys or mouse click, question generation with exact division invariants, Try Again danger line pause, and full Results screen.
 - **Space Race v1.2:** Camera follows human at $x=300$, `CATCH_UP = false`, `STEP_PX = 180`, `LAP_LENGTH = 1800`, `S_FINISH = 5750`, all bots at 70% accuracy, persistent lane swapping, nozzle-anchored flame at `(10, 58)`, auto-fit hull plate, and 2.0s idle blip attention wave.
 - **Space Race v1.1:** Orbit look with rotating moon group and parallax sky layers about $C = (505, 2100)$, teal-grey moon surface with craters and crystals, polished ship art and avatar, moon-conforming sliced grandstands, lane steering with bank angle, answer arrows holding at $x=600$ above ships, and idle blip attention wave.
 - **Space Race v1.0:** Multiplication subject, 3-lap space race on the moon, hull question plate, 4-lane chevron answer arrows, unified gates with grandstand spectators, lap ring with clockwise progress, phase machine, in-game Results screen, and 1,000-race simulation test suite.

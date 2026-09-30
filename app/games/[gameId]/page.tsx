@@ -14,6 +14,14 @@ const AlienAdditionGame = dynamic(
   { ssr: false }
 );
 
+const DragRaceGame = dynamic(
+  () =>
+    import('@/games/drag-race/DragRaceGame').then(
+      (mod) => mod.DragRaceGame
+    ),
+  { ssr: false }
+);
+
 export default function GameLobbyPage() {
   const params = useParams();
   const router = useRouter();
@@ -36,7 +44,11 @@ export default function GameLobbyPage() {
     );
   }
 
-  // Solo mode games run directly in one unified screen flow (Title -> Name -> Instructions -> Options -> Play -> Results)
+  // Games with integrated title/lobby/play flow
+  if (gameId === 'drag-race') {
+    return <DragRaceGame />;
+  }
+
   if (manifest.mode === 'solo' || gameId === 'alien-addition') {
     return <AlienAdditionGame />;
   }

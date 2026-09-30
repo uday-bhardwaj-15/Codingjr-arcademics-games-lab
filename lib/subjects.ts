@@ -29,6 +29,11 @@ export const SUBJECT_METADATA: Record<string, { name: string; description: strin
     description: 'Accelerate times table recall with fun multiplayer arcade races',
     order: 4,
   },
+  division: {
+    name: 'Division',
+    description: 'High-speed drag racing to sharpen fast division facts and math fluency',
+    order: 5,
+  },
 };
 
 export function getSubjectGroups(): SubjectGroup[] {

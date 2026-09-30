@@ -46,6 +46,47 @@ export default function ArcadeHome() {
       ),
     },
     {
+      id: 'drag-race',
+      title: 'Drag Race Division',
+      shortTitle: 'Drag Race',
+      subject: 'division',
+      subjectLabel: 'Division',
+      grade: 'Grade 3 - 6',
+      href: '/games/drag-race',
+      description: 'High-speed drag racing on the speedway! Solve division facts to accelerate your smiling dragster across the finish line.',
+      renderArt: () => (
+        <svg viewBox="0 0 200 160" className="w-full h-full">
+          {/* Sky & Horizon */}
+          <rect width="200" height="160" fill="#4b58b8" />
+          <rect y="40" width="200" height="120" fill="#169d3e" />
+          {/* Horizon Trees */}
+          <ellipse cx="40" cy="45" rx="30" ry="10" fill="#3b8852" />
+          <ellipse cx="160" cy="45" rx="30" ry="10" fill="#3b8852" />
+          {/* Perspective Asphalt Highway */}
+          <polygon points="80,45 120,45 190,160 10,160" fill="#4b5563" />
+          <line x1="100" y1="45" x2="100" y2="160" stroke="#ffffff" strokeWidth="3" strokeDasharray="10 8" />
+          {/* Pink Cute Drag Car */}
+          <g transform="translate(25, 65) scale(0.65)">
+            <ellipse cx="45" cy="45" rx="35" ry="24" fill="#ec4899" stroke="#9d174d" strokeWidth="2.5" />
+            <rect x="0" y="52" width="16" height="24" rx="4" fill="#0f172a" />
+            <rect x="74" y="52" width="16" height="24" rx="4" fill="#0f172a" />
+            <path d="M 32 38 Q 40 26 48 38" stroke="#0f172a" strokeWidth="3.5" fill="none" strokeLinecap="round" />
+            <path d="M 52 38 Q 60 26 68 38" stroke="#0f172a" strokeWidth="3.5" fill="none" strokeLinecap="round" />
+            <path d="M 38 48 Q 50 62 62 48" stroke="#0f172a" strokeWidth="3" fill="#dc2626" />
+          </g>
+          {/* Blue Smiling Drag Car */}
+          <g transform="translate(105, 75) scale(0.7)">
+            <ellipse cx="45" cy="45" rx="35" ry="24" fill="#1877f2" stroke="#0c5ec7" strokeWidth="2.5" />
+            <rect x="0" y="52" width="16" height="24" rx="4" fill="#0f172a" />
+            <rect x="74" y="52" width="16" height="24" rx="4" fill="#0f172a" />
+            <ellipse cx="38" cy="38" rx="8" ry="11" fill="#ffffff" /><circle cx="40" cy="38" r="4" fill="#000" />
+            <ellipse cx="58" cy="38" rx="8" ry="11" fill="#ffffff" /><circle cx="60" cy="38" r="4" fill="#000" />
+            <path d="M 36 50 C 40 60, 60 60, 64 50 Z" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
+          </g>
+        </svg>
+      ),
+    },
+    {
       id: 'island-chase',
       title: 'Island Chase Subtraction',
       shortTitle: 'Island Chase',
@@ -233,12 +274,13 @@ export default function ArcadeHome() {
         </div>
       </section>
 
-      {/* 2. Games Grid Section (Only our 4 real games) */}
+      {/* 2. Games Grid Section (Only our real games) */}
       <main id="games-grid" className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 flex-1">
         {/* Subject Filter Tabs */}
         <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
           {[
             { id: 'all', label: 'All Games' },
+            { id: 'division', label: 'Division' },
             { id: 'multiplication', label: 'Multiplication' },
             { id: 'subtraction', label: 'Subtraction' },
             { id: 'addition', label: 'Addition' },

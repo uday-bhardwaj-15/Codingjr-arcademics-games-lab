@@ -8,6 +8,7 @@ import { soundManager } from '@/core/audio/soundManager';
 import { Chick } from '@/games/jumping-chicks/components/Chick';
 import { JetSkiAvatar } from '@/games/island-chase/components/JetSkiAvatar';
 import { SpaceShipAvatar } from '@/games/space-race/components/SpaceShipAvatar';
+import { DragCarAvatar } from '@/games/drag-race/components/DragCarAvatar';
 import { Maximize2, Play } from 'lucide-react';
 
 interface LobbyViewProps {
@@ -194,6 +195,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({ manifest }) => {
               const displayName = isHuman ? playerName : `Computer ${idx + 1}`;
               const isJetSki = manifest.id === 'island-chase';
               const isSpaceRace = manifest.id === 'space-race';
+              const isDragRace = manifest.id === 'drag-race';
 
               return (
                 <div
@@ -202,12 +204,14 @@ export const LobbyView: React.FC<LobbyViewProps> = ({ manifest }) => {
                     isHuman
                       ? isSpaceRace
                         ? 'h-[320px] sm:h-[350px] bg-[#283248]/75 shadow-2xl backdrop-blur-sm border border-white/10 rounded-sm py-6'
+                        : isDragRace
+                        ? 'h-[300px] sm:h-[330px] bg-black/40 shadow-2xl backdrop-blur-xs rounded-none border border-white/10 py-6'
                         : 'pb-4 pt-8 bg-white/25 shadow-inner'
                       : 'h-[320px] sm:h-[350px] py-6'
                   }`}
                 >
                   {/* Host Ribbon Badge for Human Player (in water / island games) */}
-                  {isHuman && !isSpaceRace && (
+                  {isHuman && !isSpaceRace && !isDragRace && (
                     <div className="absolute top-4 left-4 flex flex-col items-center z-10 select-none">
                       <div className="w-6 h-12 bg-red-800 border border-red-950 flex flex-col items-center justify-between py-1 shadow-md relative">
                         <span className="text-[10px] text-amber-300">★</span>
@@ -221,12 +225,17 @@ export const LobbyView: React.FC<LobbyViewProps> = ({ manifest }) => {
 
                   {/* Avatar Sprite */}
                   <div className={`transform-gpu transition-transform hover:scale-105 flex items-center justify-center ${
-                    isSpaceRace && isHuman ? 'scale-110 sm:scale-115 mb-3' : 'mb-2'
+                    isSpaceRace && isHuman ? 'scale-110 sm:scale-115 mb-3' : isDragRace && isHuman ? 'scale-115 sm:scale-125 mb-3' : 'mb-2'
                   }`}>
                     {isSpaceRace ? (
                       <SpaceShipAvatar
                         color={p.color}
                         facing="front"
+                        size={isHuman ? 'lg' : 'md'}
+                      />
+                    ) : isDragRace ? (
+                      <DragCarAvatar
+                        color={p.color}
                         size={isHuman ? 'lg' : 'md'}
                       />
                     ) : isJetSki ? (
