@@ -1,400 +1,309 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { getSubjectGroups, SubjectGroup } from '@/lib/subjects';
-import { ArcadeStorage } from '@/core/state/storage';
-import { PlayerProfile, PlayerColor } from '@/core/types/player';
 import { soundManager } from '@/core/audio/soundManager';
-import { Chick } from '@/games/jumping-chicks/components/Chick';
-import {
-  Gamepad2,
-  Sparkles,
-  Trophy,
-  Users,
-  Play,
-  Flame,
-  Zap,
-  Star,
-  Layers,
-  ArrowRight,
-  Award
-} from 'lucide-react';
 
-const COLORS: { id: PlayerColor; label: string; bg: string }[] = [
-  { id: 'blue', label: 'Blue', bg: 'bg-sky-500' },
-  { id: 'yellow', label: 'Yellow', bg: 'bg-amber-400' },
-  { id: 'red', label: 'Red', bg: 'bg-rose-500' },
-  { id: 'orange', label: 'Orange', bg: 'bg-orange-500' },
-];
+export default function ArcadeHome() {
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-export default function ArcadeHub() {
-  const [profile, setProfile] = useState<PlayerProfile>({
-    id: 'player_human',
-    name: 'Player 1',
-    color: 'blue',
-    isBot: false,
-  });
+  // Exactly the 4 real games we have
+  const activeGames = [
+    {
+      id: 'space-race',
+      title: 'Space Race Multiplication',
+      shortTitle: 'Space Race',
+      subject: 'multiplication',
+      subjectLabel: 'Multiplication',
+      grade: 'Grade 2 - 5',
+      href: '/games/space-race',
+      description: '3-lap lunar space race! Solve multiplication facts to surge past rival ships to the finish banner.',
+      renderArt: () => (
+        <svg viewBox="0 0 200 160" className="w-full h-full">
+          {/* Deep space & Stars */}
+          <rect width="200" height="160" fill="#060e1f" />
+          <circle cx="30" cy="30" r="1.5" fill="#ffffff" opacity="0.8" />
+          <circle cx="170" cy="25" r="1.5" fill="#ffffff" opacity="0.8" />
+          <circle cx="120" cy="50" r="1.2" fill="#93c5fd" opacity="0.6" />
+          {/* Moon Surface at bottom */}
+          <circle cx="100" cy="280" r="150" fill="#4f8b8c" />
+          <ellipse cx="60" cy="138" rx="14" ry="4" fill="#2c5a5f" />
+          <ellipse cx="140" cy="142" rx="18" ry="5" fill="#2c5a5f" />
+          {/* Blue & Yellow Spaceships */}
+          <g transform="translate(10, 20) scale(0.65)">
+            <ellipse cx="95" cy="32" rx="28" ry="22" fill="#93c5fd" opacity="0.85" />
+            <path d="M 18 56 C 18 30, 95 26, 186 56 C 95 86, 18 82, 18 56 Z" fill="#1f6bff" stroke="#1244b8" strokeWidth="3" />
+            <ellipse cx="90" cy="31" rx="7.5" ry="9" fill="#ffffff" /><circle cx="93" cy="31" r="4" fill="#0f172a" />
+            <ellipse cx="106" cy="31" rx="7.5" ry="9" fill="#ffffff" /><circle cx="109" cy="31" r="4" fill="#0f172a" />
+          </g>
+          <g transform="translate(45, 65) scale(0.75)">
+            <ellipse cx="95" cy="32" rx="28" ry="22" fill="#93c5fd" opacity="0.85" />
+            <path d="M 18 56 C 18 30, 95 26, 186 56 C 95 86, 18 82, 18 56 Z" fill="#f5c400" stroke="#ba9400" strokeWidth="3" />
+            <ellipse cx="90" cy="31" rx="7.5" ry="9" fill="#ffffff" /><circle cx="93" cy="31" r="4" fill="#0f172a" />
+            <ellipse cx="106" cy="31" rx="7.5" ry="9" fill="#ffffff" /><circle cx="109" cy="31" r="4" fill="#0f172a" />
+          </g>
+        </svg>
+      ),
+    },
+    {
+      id: 'island-chase',
+      title: 'Island Chase Subtraction',
+      shortTitle: 'Island Chase',
+      subject: 'subtraction',
+      subjectLabel: 'Subtraction',
+      grade: 'Grade 1 - 4',
+      href: '/games/island-chase',
+      description: 'High-speed speedboat race across tropical waters! Subtract quickly to reach the island finish line.',
+      renderArt: () => (
+        <svg viewBox="0 0 200 160" className="w-full h-full">
+          {/* Tropical Ocean */}
+          <rect width="200" height="160" fill="#0891b2" />
+          <path d="M 0 100 Q 50 90, 100 100 T 200 100 L 200 160 L 0 160 Z" fill="#0e7490" />
+          <path d="M 0 130 Q 50 120, 100 130 T 200 130 L 200 160 L 0 160 Z" fill="#155e75" />
+          {/* Island with Palm Tree */}
+          <ellipse cx="165" cy="70" rx="35" ry="12" fill="#fde047" />
+          <rect x="162" y="35" width="6" height="35" rx="2" fill="#78350f" />
+          <circle cx="165" cy="32" r="18" fill="#22c55e" />
+          {/* Speedboats with Racers */}
+          <g transform="translate(15, 60) scale(0.65)">
+            <ellipse cx="65" cy="30" rx="14" ry="16" fill="#f43f5e" />
+            <circle cx="62" cy="28" r="4" fill="#ffffff" /><circle cx="63" cy="28" r="2" fill="#000" />
+            <path d="M 20 50 L 140 50 L 120 75 L 40 75 Z" fill="#ec4899" stroke="#9d174d" strokeWidth="3" />
+          </g>
+          <g transform="translate(50, 90) scale(0.7)">
+            <ellipse cx="65" cy="30" rx="14" ry="16" fill="#38bdf8" />
+            <circle cx="62" cy="28" r="4" fill="#ffffff" /><circle cx="63" cy="28" r="2" fill="#000" />
+            <path d="M 20 50 L 140 50 L 120 75 L 40 75 Z" fill="#0284c7" stroke="#075985" strokeWidth="3" />
+          </g>
+        </svg>
+      ),
+    },
+    {
+      id: 'alien-addition',
+      title: 'Alien Addition',
+      shortTitle: 'Alien Addition',
+      subject: 'addition',
+      subjectLabel: 'Addition',
+      grade: 'Grade 1 - 3',
+      href: '/games/alien-addition',
+      description: 'Defend against invading alien saucers! Solve additions and zap matching targets with your laser turret.',
+      renderArt: () => (
+        <svg viewBox="0 0 200 160" className="w-full h-full">
+          <rect width="200" height="160" fill="#1e1b4b" />
+          <circle cx="40" cy="30" r="1.5" fill="#fff" />
+          <circle cx="160" cy="40" r="1.5" fill="#fff" />
+          {/* Laser Turret */}
+          <polygon points="90,160 110,160 100,120" fill="#38bdf8" />
+          <line x1="100" y1="120" x2="100" y2="70" stroke="#f43f5e" strokeWidth="3" strokeDasharray="6 3" />
+          {/* Flying Saucers */}
+          <g transform="translate(20, 30)">
+            <ellipse cx="40" cy="30" rx="30" ry="12" fill="#4ade80" stroke="#15803d" strokeWidth="2" />
+            <circle cx="40" cy="20" r="12" fill="#a7f3d0" />
+            <circle cx="36" cy="18" r="3" fill="#0f172a" /><circle cx="44" cy="18" r="3" fill="#0f172a" />
+          </g>
+          <g transform="translate(100, 45)">
+            <ellipse cx="40" cy="30" rx="30" ry="12" fill="#facc15" stroke="#ca8a04" strokeWidth="2" />
+            <circle cx="40" cy="20" r="12" fill="#fef08a" />
+            <circle cx="36" cy="18" r="3" fill="#0f172a" /><circle cx="44" cy="18" r="3" fill="#0f172a" />
+          </g>
+        </svg>
+      ),
+    },
+    {
+      id: 'jumping-chicks',
+      title: 'Jumping Chicks Counting',
+      shortTitle: 'Jumping Chicks',
+      subject: 'counting',
+      subjectLabel: 'Counting',
+      grade: 'Grade K - 2',
+      href: '/games/jumping-chicks',
+      description: 'Count water lily petals, leap between pads, and race 3 rival chicks to the golden trophy nest!',
+      renderArt: () => (
+        <svg viewBox="0 0 200 160" className="w-full h-full">
+          {/* Pond */}
+          <rect width="200" height="160" fill="#15803d" />
+          <ellipse cx="100" cy="110" rx="90" ry="45" fill="#0284c7" />
+          {/* Lily Pads */}
+          <circle cx="50" cy="100" r="22" fill="#22c55e" stroke="#166534" strokeWidth="2" />
+          <circle cx="110" cy="115" r="25" fill="#22c55e" stroke="#166534" strokeWidth="2" />
+          <circle cx="160" cy="95" r="20" fill="#22c55e" stroke="#166534" strokeWidth="2" />
+          {/* Cute Yellow Chick */}
+          <g transform="translate(85, 55)">
+            <circle cx="25" cy="25" r="18" fill="#facc15" stroke="#ca8a04" strokeWidth="2" />
+            <circle cx="20" cy="20" r="3.5" fill="#0f172a" />
+            <polygon points="32,24 40,28 32,32" fill="#f97316" />
+          </g>
+        </svg>
+      ),
+    },
+  ];
 
-  const [subjectGroups, setSubjectGroups] = useState<SubjectGroup[]>([]);
-  const [totalMatches, setTotalMatches] = useState(0);
-  const [totalWins, setTotalWins] = useState(0);
-
-  useEffect(() => {
-    const saved = ArcadeStorage.getPlayerProfile();
-    setProfile(saved);
-    setSubjectGroups(getSubjectGroups());
-
-    // Calculate aggregated stats across games
-    const jumpingChicksHistory = ArcadeStorage.getLeaderboard('jumping-chicks');
-    const alienAdditionHistory = ArcadeStorage.getLeaderboard('alien-addition');
-    const islandChaseHistory = ArcadeStorage.getLeaderboard('island-chase');
-    const allMatches = [...jumpingChicksHistory, ...alienAdditionHistory, ...islandChaseHistory];
-
-    const wins = allMatches.filter((m) => {
-      const humanScore = m.players?.find((p) => !p.isBot);
-      return humanScore?.rank === 1;
-    }).length;
-
-    setTotalMatches(allMatches.length);
-    setTotalWins(wins);
-  }, []);
-
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const updated = { ...profile, name: e.target.value || 'Player 1' };
-    setProfile(updated);
-    ArcadeStorage.savePlayerProfile(updated);
-  };
-
-  const handleColorChange = (color: PlayerColor) => {
-    soundManager.playClick();
-    const updated = { ...profile, color };
-    setProfile(updated);
-    ArcadeStorage.savePlayerProfile(updated);
-  };
+  const filteredGames =
+    selectedCategory === 'all'
+      ? activeGames
+      : activeGames.filter((g) => g.subject === selectedCategory);
 
   return (
     <div className="min-h-full w-full bg-[#fbf7dc] text-slate-800 font-sans flex flex-col justify-between selection:bg-amber-400 selection:text-amber-950">
-      {/* Main Container */}
-      <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8 flex-1">
-        {/* Featured Games Showcase Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Featured Game 1: Alien Addition (New!) */}
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#120524] via-[#240e44] to-[#451268] p-6 sm:p-8 text-white shadow-xl border border-purple-500/40 flex flex-col justify-between">
-            <div className="absolute top-0 right-0 -mr-12 -mt-12 w-64 h-64 rounded-full bg-cyan-400/20 blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 left-1/3 -mb-12 w-48 h-48 rounded-full bg-fuchsia-400/20 blur-2xl pointer-events-none" />
+      {/* 1. Hero Banner Section */}
+      <section className="w-full bg-[#1b1919] overflow-hidden relative border-b-4 border-[#f26522]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16 relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
+          {/* Left Text Block */}
+          <div className="w-full lg:w-1/2 space-y-4 text-left">
+            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-wide">
+              Arcade + Academics =
+            </h2>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-none drop-shadow-md">
+              Fun Learning
+            </h1>
+            <p className="text-sm sm:text-base text-slate-200 font-medium leading-relaxed max-w-lg">
+              Learn math facts quickly and boost student engagement with our free skill-building multiplayer math games & races!
+            </p>
 
-            <div className="relative z-10 space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="inline-flex items-center gap-1.5 bg-[#f59e1b] text-amber-950 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider shadow-md">
-                  <Flame className="w-3.5 h-3.5 fill-current" />
-                  New Game #2
-                </div>
-                <span className="text-xs font-black bg-white/20 backdrop-blur-md px-3 py-0.5 rounded-full border border-white/30 text-purple-200">
-                  Subject: Addition
-                </span>
-              </div>
-
-              <div>
-                <h2 className="text-3xl sm:text-4xl font-black italic tracking-tight drop-shadow-md">
-                  Alien Addition
-                </h2>
-                <p className="text-xs sm:text-sm text-purple-100/90 font-medium mt-1 leading-relaxed">
-                  Defend the galaxy against invading alien saucers! Move your laser turret, solve the addition problems on the saucers, and zap the correct match before time runs out!
-                </p>
-              </div>
-
-              <div className="flex flex-wrap gap-2 pt-1 text-xs">
-                <span className="bg-white/15 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-white/20 font-bold text-purple-100">
-                  🛸 5 Flying Saucers
-                </span>
-                <span className="bg-white/15 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-white/20 font-bold text-purple-100">
-                  ⚡ Laser Turret Target Match
-                </span>
-                <span className="bg-white/15 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-white/20 font-bold text-amber-300">
-                  ⏱️ 60s Timed Arcade Solo
-                </span>
-              </div>
-            </div>
-
-            <div className="relative z-10 pt-6 flex items-center gap-3">
-              <Link
-                href="/games/alien-addition"
+            {/* Big Chevron PLAY Button */}
+            <div className="pt-3">
+              <a
+                href="#games-grid"
                 onClick={() => soundManager.playClick()}
-                className="flex-1 py-3.5 rounded-2xl bg-[#f59e1b] hover:bg-[#ffaa22] active:scale-95 text-white font-black italic text-base sm:text-lg shadow-lg shadow-amber-500/30 flex items-center justify-center gap-2 transition-transform border-b-4 border-amber-600 cursor-pointer"
+                className="inline-flex items-center justify-center px-10 py-3.5 rounded-xl bg-gradient-to-r from-[#f59e1b] via-[#ea580c] to-[#d97706] hover:brightness-110 active:scale-95 text-white font-black italic text-xl tracking-wider shadow-xl border-2 border-yellow-300 transition-all cursor-pointer group"
               >
-                <Play className="w-5 h-5 fill-current" />
-                <span>PLAY ALIEN ADDITION</span>
-              </Link>
+                <span className="text-yellow-200 group-hover:-translate-x-1 transition-transform mr-2">««</span>
+                <span>PLAY</span>
+                <span className="text-yellow-200 group-hover:translate-x-1 transition-transform ml-2">»»</span>
+              </a>
             </div>
           </div>
 
-          {/* Featured Game 2: Jumping Chicks */}
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1b6b55] via-[#2a8b72] to-[#48caaa] p-6 sm:p-8 text-white shadow-xl border border-teal-300/30 flex flex-col justify-between">
-            <div className="absolute top-0 right-0 -mr-12 -mt-12 w-64 h-64 rounded-full bg-yellow-300/20 blur-3xl pointer-events-none" />
+          {/* Right Hero Artwork: Racing Speedway */}
+          <div className="w-full lg:w-1/2 flex items-center justify-center relative">
+            <svg viewBox="0 0 540 320" className="w-full max-w-[500px] h-auto drop-shadow-2xl overflow-visible">
+              <defs>
+                <linearGradient id="trackGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#1e293b" />
+                  <stop offset="50%" stopColor="#0f172a" />
+                  <stop offset="100%" stopColor="#020617" />
+                </linearGradient>
+                <linearGradient id="speedRays" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#22c55e" stopOpacity="0.8" />
+                  <stop offset="100%" stopColor="#065f46" stopOpacity="0.2" />
+                </linearGradient>
+              </defs>
 
-            <div className="relative z-10 space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="inline-flex items-center gap-1.5 bg-amber-400 text-amber-950 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider shadow-md">
-                  <Star className="w-3.5 h-3.5 fill-current" />
-                  Game #1
-                </div>
-                <span className="text-xs font-black bg-white/20 backdrop-blur-md px-3 py-0.5 rounded-full border border-white/30 text-teal-100">
-                  Subject: Counting
-                </span>
-              </div>
+              {/* Green Speed Burst */}
+              <path d="M 200 0 L 540 0 L 540 320 L 350 320 Z" fill="url(#speedRays)" />
 
-              <div>
-                <h2 className="text-3xl sm:text-4xl font-black italic tracking-tight drop-shadow-md">
-                  Jumping Chicks
-                </h2>
-                <p className="text-xs sm:text-sm text-teal-50/90 font-medium mt-1 leading-relaxed">
-                  Count the lily petals on each water lily pad, leap onto matching number platforms, and race across the pond to the golden trophy nest!
-                </p>
-              </div>
+              {/* Curved Racetrack */}
+              <path d="M 0 160 C 180 80, 360 80, 540 180 L 540 320 L 0 320 Z" fill="url(#trackGrad)" />
+              <path d="M 0 240 C 180 180, 360 180, 540 260" stroke="#facc15" strokeWidth="4" strokeDasharray="16 12" fill="none" />
 
-              <div className="flex flex-wrap gap-2 pt-1 text-xs">
-                <span className="bg-white/15 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-white/20 font-bold text-teal-100">
-                  🐣 4 Racing Chicks
-                </span>
-                <span className="bg-white/15 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-white/20 font-bold text-teal-100">
-                  🌸 Number Recognition
-                </span>
-                <span className="bg-white/15 backdrop-blur-sm px-2.5 py-1 rounded-lg border border-white/20 font-bold text-amber-300">
-                  🏆 Trophy Nest Finish
-                </span>
-              </div>
-            </div>
+              {/* Yellow Cute Race Car */}
+              <g transform="translate(240, 75) rotate(12)">
+                <ellipse cx="65" cy="55" rx="55" ry="38" fill="#facc15" stroke="#ca8a04" strokeWidth="3" />
+                <rect x="0" y="70" width="22" height="28" rx="6" fill="#0f172a" />
+                <rect x="95" y="70" width="22" height="28" rx="6" fill="#0f172a" />
+                <ellipse cx="50" cy="42" rx="12" ry="16" fill="#ffffff" stroke="#000" strokeWidth="2" />
+                <ellipse cx="52" cy="42" rx="6" ry="8" fill="#000000" />
+                <ellipse cx="80" cy="42" rx="12" ry="16" fill="#ffffff" stroke="#000" strokeWidth="2" />
+                <ellipse cx="82" cy="42" rx="6" ry="8" fill="#000000" />
+                <path d="M 50 68 Q 66 82 82 68" stroke="#78350f" strokeWidth="4" fill="none" strokeLinecap="round" />
+              </g>
 
-            <div className="relative z-10 pt-6 flex items-center gap-3">
-              <Link
-                href="/games/jumping-chicks"
-                onClick={() => soundManager.playClick()}
-                className="flex-1 py-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 active:scale-95 text-amber-950 font-black italic text-base sm:text-lg shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2 transition-transform border-b-4 border-amber-600 cursor-pointer"
-              >
-                <Play className="w-5 h-5 fill-current" />
-                <span>PLAY JUMPING CHICKS</span>
-              </Link>
-            </div>
+              {/* Blue Lightning Race Car */}
+              <g transform="translate(380, 105) rotate(6)">
+                <ellipse cx="55" cy="45" rx="45" ry="32" fill="#38bdf8" stroke="#0284c7" strokeWidth="3" />
+                <rect x="0" y="55" width="18" height="24" rx="5" fill="#0f172a" />
+                <rect x="80" y="55" width="18" height="24" rx="5" fill="#0f172a" />
+                <ellipse cx="44" cy="35" rx="10" ry="14" fill="#ffffff" stroke="#000" strokeWidth="2" />
+                <ellipse cx="45" cy="35" rx="5" ry="7" fill="#000000" />
+                <ellipse cx="68" cy="35" rx="10" ry="14" fill="#ffffff" stroke="#000" strokeWidth="2" />
+                <ellipse cx="69" cy="35" rx="5" ry="7" fill="#000000" />
+              </g>
+
+              {/* Green Smiling Jet Racer */}
+              <g transform="translate(260, 0) rotate(18)">
+                <ellipse cx="45" cy="35" rx="35" ry="24" fill="#4ade80" stroke="#16a34a" strokeWidth="2.5" />
+                <ellipse cx="36" cy="28" rx="8" ry="10" fill="#ffffff" />
+                <ellipse cx="54" cy="28" rx="8" ry="10" fill="#ffffff" />
+              </g>
+
+              {/* Golden Lightning Bolt */}
+              <polygon points="400,20 440,70 420,70 450,130 405,65 425,65" fill="#facc15" className="drop-shadow-lg" />
+            </svg>
           </div>
         </div>
+      </section>
 
-        {/* Global Player Customization & Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-          {/* Player Profile Card */}
-          <div className="md:col-span-6 lg:col-span-5 rounded-3xl bg-white p-6 border border-amber-200/80 shadow-md space-y-4">
-            <div className="flex items-center gap-3 border-b border-amber-100 pb-3">
-              <div className="w-9 h-9 rounded-xl bg-amber-100 text-[#c05a00] flex items-center justify-center">
-                <Award className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-base font-black text-slate-900">Your Player Profile</h3>
-                <p className="text-xs font-bold text-slate-500">Shared across all arcade games</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-b from-amber-100 to-amber-200 border border-amber-300 flex items-center justify-center shadow-inner">
-                <div className="transform scale-90">
-                  <Chick color={profile.color} size="sm" showShadow={false} />
-                </div>
-              </div>
-
-              <div className="flex-1 space-y-2">
-                <div>
-                  <label className="block text-[11px] font-black uppercase text-slate-500 mb-1">
-                    Racer Name
-                  </label>
-                  <input
-                    type="text"
-                    maxLength={16}
-                    value={profile.name}
-                    onChange={handleNameChange}
-                    className="w-full px-3 py-1.5 text-sm font-extrabold rounded-xl bg-slate-50 border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#f59e1b] text-slate-900"
-                    placeholder="Enter nickname"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-black uppercase text-slate-500 mb-1">
-                    Color Theme
-                  </label>
-                  <div className="flex items-center gap-2">
-                    {COLORS.map((c) => (
-                      <button
-                        key={c.id}
-                        onClick={() => handleColorChange(c.id)}
-                        className={`w-7 h-7 rounded-full ${c.bg} transition-transform ${
-                          profile.color === c.id
-                            ? 'scale-125 ring-4 ring-amber-400 shadow-md'
-                            : 'opacity-70 hover:opacity-100 hover:scale-110'
-                        }`}
-                        title={c.label}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Player Career Stats */}
-          <div className="md:col-span-6 lg:col-span-7 rounded-3xl bg-white p-6 border border-amber-200/80 shadow-md flex flex-col justify-between">
-            <div className="flex items-center gap-3 border-b border-amber-100 pb-3">
-              <div className="w-9 h-9 rounded-xl bg-amber-100 text-[#c05a00] flex items-center justify-center">
-                <Trophy className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-base font-black text-slate-900">Career Match Records</h3>
-                <p className="text-xs font-bold text-slate-500">Saved in browser localStorage</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-3 gap-4 my-2">
-              <div className="bg-amber-50/70 rounded-2xl p-4 border border-amber-200/70 text-center">
-                <span className="text-2xl sm:text-3xl font-black text-slate-900">{totalMatches}</span>
-                <p className="text-[11px] font-bold text-slate-600 uppercase tracking-wider mt-1">
-                  Matches Played
-                </p>
-              </div>
-
-              <div className="bg-amber-50/70 rounded-2xl p-4 border border-amber-200/70 text-center">
-                <span className="text-2xl sm:text-3xl font-black text-[#c05a00]">{totalWins}</span>
-                <p className="text-[11px] font-bold text-[#c05a00] uppercase tracking-wider mt-1">
-                  1st Place Wins
-                </p>
-              </div>
-
-              <div className="bg-amber-50/70 rounded-2xl p-4 border border-amber-200/70 text-center">
-                <span className="text-2xl sm:text-3xl font-black text-emerald-700">
-                  {totalMatches > 0 ? Math.round((totalWins / totalMatches) * 100) : 0}%
-                </span>
-                <p className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider mt-1">
-                  Win Rate
-                </p>
-              </div>
-            </div>
-
-            <div className="text-right">
-              <span className="text-[11px] font-bold text-slate-400">
-                Pure Client-Side Architecture • Instant Play
-              </span>
-            </div>
-          </div>
+      {/* 2. Games Grid Section (Only our 4 real games) */}
+      <main id="games-grid" className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 flex-1">
+        {/* Subject Filter Tabs */}
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+          {[
+            { id: 'all', label: 'All Games' },
+            { id: 'multiplication', label: 'Multiplication' },
+            { id: 'subtraction', label: 'Subtraction' },
+            { id: 'addition', label: 'Addition' },
+            { id: 'counting', label: 'Counting' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => {
+                soundManager.playClick();
+                setSelectedCategory(tab.id);
+              }}
+              className={`px-5 sm:px-6 py-2 rounded-full font-black text-xs sm:text-sm tracking-wide transition-all cursor-pointer ${
+                selectedCategory === tab.id
+                  ? 'bg-[#f26522] text-white shadow-md scale-105'
+                  : 'bg-white/80 hover:bg-white text-slate-700 hover:text-[#f26522] border border-amber-200'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
 
-        {/* Games Grouped by Subject Sections */}
-        <div className="space-y-8 pt-4">
-          <div className="flex items-center justify-between border-b border-amber-300 pb-3">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-[#c05a00] text-white flex items-center justify-center font-black">
-                <Layers className="w-4 h-4" />
-              </div>
-              <div>
-                <h2 className="text-xl sm:text-2xl font-black text-[#c05a00] tracking-tight">
-                  Arcade Games by Subject
-                </h2>
-                <p className="text-xs font-bold text-slate-500">
-                  Explore racing games organized by mathematical learning domains
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {subjectGroups.map((group) => (
-            <section key={group.id} className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg sm:text-xl font-black text-slate-900 flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#f59e1b]" />
-                    {group.name}
-                  </h3>
-                  <p className="text-xs text-slate-500 font-medium">{group.description}</p>
+        {/* 4 Active Game Cards Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-2">
+          {filteredGames.map((game) => (
+            <Link
+              key={game.id}
+              href={game.href}
+              onClick={() => soundManager.playClick()}
+              className="group flex flex-col items-center space-y-3 focus:outline-none cursor-pointer"
+            >
+              {/* Card Container with Artwork & Orange PLAY Banner */}
+              <div className="relative w-full aspect-square rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl group-hover:-translate-y-2 transition-all duration-200 border-2 border-amber-300/80 bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center">
+                {/* Game Artwork */}
+                <div className="absolute inset-0 w-full h-full flex items-center justify-center">
+                  {game.renderArt()}
                 </div>
-                <span className="text-xs font-bold text-slate-500 bg-white px-3 py-1 rounded-full border border-amber-200">
-                  {group.games.length} {group.games.length === 1 ? 'Game' : 'Games'}
+
+                {/* Orange Chevron PLAY Banner across center */}
+                <div className="relative z-10 w-[82%] py-2 bg-gradient-to-r from-[#f59e1b] via-[#ea580c] to-[#f59e1b] border-2 border-yellow-300 rounded-md shadow-xl flex items-center justify-center group-hover:scale-105 transition-transform">
+                  <span className="font-black italic text-white text-sm sm:text-base tracking-widest drop-shadow">
+                    PLAY
+                  </span>
+                </div>
+              </div>
+
+              {/* Title & Subject Info */}
+              <div className="text-center space-y-1">
+                <span className="block font-black text-base sm:text-lg text-[#92400e] group-hover:text-[#ea580c] transition-colors leading-tight">
+                  {game.shortTitle}
+                </span>
+                <span className="inline-block text-[11px] font-bold text-slate-500 uppercase tracking-wider bg-amber-100/70 px-2.5 py-0.5 rounded-full border border-amber-200/60">
+                  {game.subjectLabel} • {game.grade}
                 </span>
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-                {group.games.map((game) => {
-                  const isPlayable =
-                    game.id === 'jumping-chicks' ||
-                    game.id === 'alien-addition' ||
-                    game.id === 'island-chase';
-
-                  return (
-                    <div
-                      key={game.id}
-                      className={`relative rounded-3xl p-6 border transition-all flex flex-col justify-between bg-white ${
-                        isPlayable
-                          ? 'border-amber-300 shadow-lg hover:shadow-xl hover:border-[#f59e1b]'
-                          : 'border-slate-200 opacity-70 bg-slate-50/60'
-                      }`}
-                    >
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs font-black px-2.5 py-0.5 rounded-full bg-amber-100 text-[#c05a00] border border-amber-200">
-                            {game.category}
-                          </span>
-                          <span
-                            className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-md ${
-                              isPlayable
-                                ? 'bg-emerald-100 text-emerald-800'
-                                : 'bg-slate-200 text-slate-600'
-                            }`}
-                          >
-                            {isPlayable ? 'Ready to Play' : game.badge}
-                          </span>
-                        </div>
-
-                        <h4 className="text-xl sm:text-2xl font-black text-slate-900">{game.title}</h4>
-                        <p className="text-xs sm:text-sm font-medium text-slate-600 leading-relaxed">
-                          {game.description}
-                        </p>
-
-                        <div className="text-xs font-bold text-slate-500 flex items-center gap-3 pt-1">
-                          <span>Grade: {game.gradeLevel}</span>
-                          <span>•</span>
-                          <span>
-                            {game.mode === 'solo'
-                              ? '1 Player (Arcade Solo)'
-                              : `${game.minPlayers} Players (1 Human + 3 Bots)`}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="pt-6">
-                        {isPlayable ? (
-                          <Link
-                            href={game.routes.lobby}
-                            onClick={() => soundManager.playClick()}
-                            className="w-full py-3 rounded-2xl bg-[#f59e1b] hover:bg-[#ffaa22] text-white font-black italic text-sm sm:text-base flex items-center justify-center gap-2 shadow-md active:scale-98 transition-transform border-b-2 border-amber-600 cursor-pointer"
-                          >
-                            <Play className="w-4 h-4 fill-current" />
-                            <span>{game.mode === 'solo' ? 'PLAY GAME' : 'ENTER GAME LOBBY'}</span>
-                          </Link>
-                        ) : (
-                          <button
-                            disabled
-                            className="w-full py-3 rounded-2xl bg-slate-200 text-slate-400 font-bold text-xs cursor-not-allowed"
-                          >
-                            Coming Soon
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
+            </Link>
           ))}
         </div>
       </main>
 
-      {/* Arcade Footer */}
-      <footer className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 border-t border-amber-200/80 text-center text-xs font-bold text-slate-500">
-        Arcademics Arcade Platform • Scalable Subject-Driven Game Modules • Pure Client-Side Architecture
+      {/* Footer */}
+      <footer className="w-full bg-white/70 border-t border-amber-200/80 py-6 text-center text-xs font-bold text-slate-500">
+        <div className="max-w-7xl mx-auto px-4">
+          Multiplayer Math Racing & Practice Games
+        </div>
       </footer>
     </div>
   );

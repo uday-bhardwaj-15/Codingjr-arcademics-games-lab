@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { ShipState, MultiplicationQuestion } from '../types';
-import { SHIP_PALETTES, SHIP_W, SHIP_H, PLATE, PLATE_FONT_MIN, PLATE_FONT_MAX } from '../constants';
+import { SHIP_PALETTES, SHIP_W, SHIP_H, PLATE, PLATE_FONT_MIN, PLATE_FONT_MAX, NOZZLE } from '../constants';
 
 interface SpaceShipProps {
   ship: ShipState;
@@ -62,12 +62,14 @@ export function SpaceShip({
           75% { transform: rotate(4deg); }
           100% { transform: rotate(0deg); }
         }
-        .exhaust-flicker {
-          animation: exhaustFlickerAnim 0.09s ease-in-out infinite alternate;
+        .exhaust-scale-anim {
+          animation: exhaustScaleKeyframes 0.09s ease-in-out infinite alternate;
+          transform-box: fill-box;
+          transform-origin: 100% 50%;
         }
-        @keyframes exhaustFlickerAnim {
-          0% { transform: scaleX(0.90) scaleY(0.95); opacity: 0.85; }
-          100% { transform: scaleX(1.18) scaleY(1.05); opacity: 1; }
+        @keyframes exhaustScaleKeyframes {
+          0% { transform: scaleX(0.88) scaleY(0.92); opacity: 0.85; }
+          100% { transform: scaleX(1.15) scaleY(1.06); opacity: 1; }
         }
       `}</style>
 
@@ -119,30 +121,41 @@ export function SpaceShip({
             </div>
           )}
 
-          {/* 3. Polished SpaceShip SVG with Anchored Nozzle Flame & Bank Angle */}
+          {/* 3. Chunky Saucer SpaceShip SVG */}
           <svg
-            viewBox="0 0 200 100"
+            viewBox="0 0 210 105"
             className="w-full h-full drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)] overflow-visible"
             style={{
               transform: `rotate(${ship.bankDeg || 0}deg)`,
-              transformOrigin: '95px 58px',
+              transformOrigin: '105px 62px',
             }}
           >
             <defs>
-              {/* Hull Gradient: Top highlight -> Base Color -> Dark Belly */}
-              <linearGradient id={`shipHull_${ship.id}`} x1="0%" y1="0%" x2="0%" y2="100%">
+              {/* Upper Deck Gradient */}
+              <linearGradient id={`shipDeck_${ship.id}`} x1="0%" y1="0%" x2="0%" y2="100%">
                 <stop offset="0%" stopColor={pal.highlight} />
-                <stop offset="25%" stopColor={pal.deck} />
-                <stop offset="55%" stopColor={pal.hull} />
+                <stop offset="35%" stopColor={pal.deck} />
+                <stop offset="100%" stopColor={pal.hull} />
+              </linearGradient>
+
+              {/* Lower Belly Dark Gradient */}
+              <linearGradient id={`shipBelly_${ship.id}`} x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor={pal.hull} />
                 <stop offset="100%" stopColor={pal.hullDark} />
               </linearGradient>
 
-              {/* Cockpit Glass Gradient */}
+              {/* Glass Bubble Dome Gradient */}
               <linearGradient id="shipGlassGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#ffffff" stopOpacity="0.95" />
                 <stop offset="25%" stopColor="#dbeafe" stopOpacity="0.85" />
                 <stop offset="70%" stopColor="#93c5fd" stopOpacity="0.75" />
                 <stop offset="100%" stopColor="#1e40af" stopOpacity="0.85" />
+              </linearGradient>
+
+              {/* Question Plate Gradient */}
+              <linearGradient id={`shipPlateGrad_${ship.id}`} x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="#091b2e" />
+                <stop offset="100%" stopColor="#040d17" />
               </linearGradient>
 
               {/* Normal Thruster Flame */}
@@ -162,103 +175,127 @@ export function SpaceShip({
               </linearGradient>
             </defs>
 
-            {/* A. Thruster Exhaust Flames (Anchored directly at nozzle (10, 58) extending left) */}
+            {/* A. Thruster Exhaust Flames (Anchored directly at nozzle (6, 62)) */}
             {isRacing && (
-              <g className="exhaust-flicker" transform="translate(10, 58)">
-                {isSurging ? (
-                  <>
-                    <path
-                      d="M 0 0 C -30 -16, -80 -22, -120 0 C -80 22, -30 16, 0 0 Z"
-                      fill={`url(#surgeGrad_${ship.id})`}
-                    />
-                    <path
-                      d="M 0 0 C -15 -8, -50 -10, -75 0 C -50 10, -15 8, 0 0 Z"
-                      fill="#ffffff"
-                    />
-                  </>
-                ) : (
-                  <>
-                    <path
-                      d="M 0 0 C -15 -10, -45 -14, -65 0 C -45 14, -15 10, 0 0 Z"
-                      fill={`url(#flameGrad_${ship.id})`}
-                    />
-                    <path
-                      d="M 0 0 C -8 -5, -25 -7, -38 0 C -25 7, -8 5, 0 0 Z"
-                      fill="#ffffff"
-                    />
-                  </>
-                )}
+              <g transform={`translate(${NOZZLE.x}, ${NOZZLE.y})`}>
+                <g className="exhaust-scale-anim">
+                  {isSurging ? (
+                    <>
+                      <path
+                        d="M 0 0 C -30 -18, -85 -24, -135 0 C -85 24, -30 18, 0 0 Z"
+                        fill={`url(#surgeGrad_${ship.id})`}
+                      />
+                      <path
+                        d="M 0 0 C -15 -9, -50 -11, -85 0 C -50 11, -15 9, 0 0 Z"
+                        fill="#ffffff"
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <path
+                        d="M 0 0 C -15 -10, -45 -14, -75 0 C -45 14, -15 10, 0 0 Z"
+                        fill={`url(#flameGrad_${ship.id})`}
+                      />
+                      <path
+                        d="M 0 0 C -8 -5, -25 -7, -45 0 C -25 7, -8 5, 0 0 Z"
+                        fill="#ffffff"
+                      />
+                    </>
+                  )}
+                </g>
               </g>
             )}
 
             {/* B. Top Swept Tail Fin */}
             <path
-              d="M 32 44 L 12 18 C 8 13, 22 10, 44 26 L 68 44 Z"
+              d="M 28 48 L 8 14 C 4 9, 22 7, 46 25 L 70 48 Z"
               fill={pal.wings}
               stroke={pal.hullDark}
               strokeWidth="2.5"
             />
-            {/* Lower Fin */}
+            {/* Small Lower Tail Fin */}
             <path
-              d="M 32 72 L 14 92 C 10 96, 22 98, 42 84 L 65 72 Z"
+              d="M 28 76 L 10 95 C 6 99, 20 100, 42 86 L 66 76 Z"
               fill={pal.wings}
               stroke={pal.hullDark}
               strokeWidth="2.5"
             />
 
-            {/* C. Rear Dark Metal Nozzle at (10, 58) */}
-            <rect x="10" y="49" width="14" height="18" rx="3" fill="#334155" stroke="#0f172a" strokeWidth="2" />
-
-            {/* D. Main Rounded Hull (56px tall from y=30 to y=86, length tail x=8 to nose x=186) */}
+            {/* C. Rear Thruster Cone Nozzle at (6, 62) */}
             <path
-              d="M 18 58 C 18 30, 95 26, 186 58 C 95 90, 18 86, 18 58 Z"
-              fill={`url(#shipHull_${ship.id})`}
+              d="M 4 50 L 22 54 L 22 70 L 4 74 Z"
+              fill="#334155"
+              stroke="#0f172a"
+              strokeWidth="2.5"
+            />
+            <ellipse cx="4" cy="62" rx="3.5" ry="12" fill="#1e293b" stroke="#0f172a" strokeWidth="1.5" />
+
+            {/* D. Main Chunky Saucer Hull Body (Deep belly down to y=98, top deck y=26, axis y=62) */}
+            {/* Lower Hull Belly (Shaded) */}
+            <path
+              d="M 16 62 C 16 92, 102 98, 196 62 C 102 70, 16 70, 16 62 Z"
+              fill={`url(#shipBelly_${ship.id})`}
+            />
+
+            {/* Full Hull Outer Shell */}
+            <path
+              d="M 16 62 C 16 28, 102 24, 196 62 C 102 98, 16 94, 16 62 Z"
+              fill={`url(#shipDeck_${ship.id})`}
               stroke={pal.hullDark}
               strokeWidth="3.5"
             />
 
-            {/* Upper Specular Gloss Strip */}
+            {/* Hull Center Specular Ridge Line */}
             <path
-              d="M 45 44 C 85 34, 135 36, 172 52"
+              d="M 18 62 Q 102 70 194 62"
               fill="none"
-              stroke="#ffffff"
-              strokeWidth="2.5"
-              strokeLinecap="round"
+              stroke={pal.hullDark}
+              strokeWidth="2"
               opacity="0.6"
             />
 
-            {/* E. Glass Bubble Dome Cockpit (Rising from hull near x=100) */}
-            <ellipse
-              cx="110"
-              cy="40"
-              rx="30"
-              ry="24"
-              fill="url(#shipGlassGrad)"
-              stroke="#0f172a"
-              strokeWidth="2.5"
-            />
-            {/* Specular White Reflection Arc */}
+            {/* Upper Hull Gloss Highlight Arc */}
             <path
-              d="M 94 30 C 102 22, 122 22, 132 30"
+              d="M 42 42 C 85 31, 148 33, 184 54"
               fill="none"
               stroke="#ffffff"
               strokeWidth="3"
               strokeLinecap="round"
-              opacity="0.9"
+              opacity="0.65"
+            />
+
+            {/* E. Glass Bubble Dome Cockpit (Sitting on top of hull, cy=30, rx=31, ry=25) */}
+            <ellipse
+              cx="104"
+              cy="30"
+              rx="31"
+              ry="25"
+              fill="url(#shipGlassGrad)"
+              stroke="#0f172a"
+              strokeWidth="2.5"
+            />
+            {/* Specular White Glass Reflection Arc */}
+            <path
+              d="M 86 20 C 94 12, 116 12, 126 20"
+              fill="none"
+              stroke="#ffffff"
+              strokeWidth="3.5"
+              strokeLinecap="round"
+              opacity="0.95"
             />
 
             {/* F. Creature Inside Dome with Forward-Right Looking Eyes */}
             {/* Left Eye */}
-            <ellipse cx="106" cy="40" rx="8" ry="9.5" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
-            <ellipse cx="109" cy="40" rx="4.5" ry="6" fill="#0f172a" />
-            <circle cx="108" cy="37" r="2" fill="#ffffff" />
+            <ellipse cx="98" cy="29" rx="8.5" ry="10.5" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
+            <ellipse cx="102.5" cy="29" rx="4.5" ry="6.5" fill="#0f172a" />
+            <circle cx="100.5" cy="26" r="2" fill="#ffffff" />
 
             {/* Right Eye */}
-            <ellipse cx="122" cy="40" rx="8" ry="9.5" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
-            <ellipse cx="125" cy="40" rx="4.5" ry="6" fill="#0f172a" />
-            <circle cx="124" cy="37" r="2" fill="#ffffff" />
+            <ellipse cx="116" cy="29" rx="8.5" ry="10.5" fill="#ffffff" stroke="#0f172a" strokeWidth="2" />
+            <ellipse cx="120.5" cy="29" rx="4.5" ry="6.5" fill="#0f172a" />
+            <circle cx="118.5" cy="26" r="2" fill="#ffffff" />
 
-            {/* G. Hull Question Plate (84x34 at local (62, 41), inside hull, clipped) */}
+            {/* G. Hull Question Plate (Comfortably nested inside the hull body at x=56, y=52, w=98, h=36) */}
             {isHuman && (
               <g transform={`translate(${PLATE.x}, ${PLATE.y})`}>
                 <rect
@@ -266,10 +303,11 @@ export function SpaceShip({
                   y="0"
                   width={PLATE.w}
                   height={PLATE.h}
-                  rx="6"
-                  fill="#091b2e"
+                  rx="8"
+                  fill={`url(#shipPlateGrad_${ship.id})`}
                   stroke="#38bdf8"
-                  strokeWidth="2"
+                  strokeWidth="2.5"
+                  className="drop-shadow-md"
                 />
                 {question && (
                   <text
@@ -291,7 +329,7 @@ export function SpaceShip({
 
             {/* H. Nose Cone Highlight */}
             <path
-              d="M 174 53 Q 190 58 174 63 Z"
+              d="M 182 56 Q 198 62 182 68 Z"
               fill={pal.highlight}
               stroke={pal.hullDark}
               strokeWidth="2"

@@ -1,4 +1,4 @@
-import { BotConfig } from './types';
+import { BotConfig } from "./types";
 
 export const STAGE = { w: 1010, h: 577 };
 
@@ -44,12 +44,12 @@ export const BLIP_URGENT_MS = 3000; // last 3s before timeout
 export const BLIP_URGENT_PERIOD_MS = 600; // urgent blip wave period
 export const BLIP_SCALE = 1.14; // v1.2: peak pulse scale
 
-// 5. Steering, Lane Swapping & Ship Dimensions (Section 23.4, 23.5, 23.6, 23.11)
-export const SHIP_W = 190;
-export const SHIP_H = 96;
-export const HULL_H = 56;
-export const NOZZLE = { x: 10, y: 58 } as const;
-export const PLATE = { x: 62, y: 41, w: 84, h: 34 } as const;
+// 5. Steering, Lane Swapping & Ship Dimensions (Chunky Saucer Body)
+export const SHIP_W = 210;
+export const SHIP_H = 104;
+export const HULL_H = 68;
+export const NOZZLE = { x: 6, y: 62 } as const;
+export const PLATE = { x: 56, y: 56, w: 85, h: 30 } as const;
 export const PLATE_FONT_MIN = 18;
 export const PLATE_FONT_MAX = 30;
 
@@ -69,12 +69,27 @@ export const RESULTS_DELAY_MS = 1000; // 1s delay after human crosses
 export const DT_CLAMP_MS = 100;
 export const MAX_RACE_SECONDS = 180;
 
-// 7. Bot Profiles (v1.2: all bots 0.70 accuracy)
-export const BOT_ACCURACY = 0.70;
+// 7. Bot Profiles
+export const BOT_ACCURACY = 0.8;
 export const BOT_PROFILES: Record<number, BotConfig> = {
-  1: { accuracy: BOT_ACCURACY, meanTimeSec: 7.0, sdTimeSec: 1.5, minTimeSec: 2.5 }, // Computer 2
-  2: { accuracy: BOT_ACCURACY, meanTimeSec: 5.5, sdTimeSec: 1.2, minTimeSec: 2.2 }, // Computer 3
-  3: { accuracy: BOT_ACCURACY, meanTimeSec: 4.5, sdTimeSec: 1.0, minTimeSec: 2.0 }, // Computer 4
+  1: {
+    accuracy: BOT_ACCURACY,
+    meanTimeSec: 7.0,
+    sdTimeSec: 1.5,
+    minTimeSec: 2.5,
+  }, // Computer 2
+  2: {
+    accuracy: BOT_ACCURACY,
+    meanTimeSec: 5.5,
+    sdTimeSec: 1.2,
+    minTimeSec: 2.2,
+  }, // Computer 3
+  3: {
+    accuracy: BOT_ACCURACY,
+    meanTimeSec: 4.5,
+    sdTimeSec: 1.0,
+    minTimeSec: 2.0,
+  }, // Computer 4
 };
 
 // 8. Ship & Palette Styles
@@ -89,43 +104,43 @@ export interface ShipColorPalette {
 
 export const SHIP_PALETTES: Record<string, ShipColorPalette> = {
   blue: {
-    hull: '#1f6bff',
-    hullDark: '#1244b8',
-    deck: '#3b82f6',
-    wings: '#1955cc',
-    highlight: '#70a4ff',
-    glow: 'rgba(31, 107, 255, 0.6)',
+    hull: "#1f6bff",
+    hullDark: "#1244b8",
+    deck: "#3b82f6",
+    wings: "#1955cc",
+    highlight: "#70a4ff",
+    glow: "rgba(31, 107, 255, 0.6)",
   },
   yellow: {
-    hull: '#f5c400',
-    hullDark: '#ba9400',
-    deck: '#facc15',
-    wings: '#c99f00',
-    highlight: '#ffe666',
-    glow: 'rgba(245, 196, 0, 0.6)',
+    hull: "#f5c400",
+    hullDark: "#ba9400",
+    deck: "#facc15",
+    wings: "#c99f00",
+    highlight: "#ffe666",
+    glow: "rgba(245, 196, 0, 0.6)",
   },
   red: {
-    hull: '#e8321f',
-    hullDark: '#aa1f11',
-    deck: '#ef4444',
-    wings: '#b82314',
-    highlight: '#ff7766',
-    glow: 'rgba(232, 50, 31, 0.6)',
+    hull: "#e8321f",
+    hullDark: "#aa1f11",
+    deck: "#ef4444",
+    wings: "#b82314",
+    highlight: "#ff7766",
+    glow: "rgba(232, 50, 31, 0.6)",
   },
   orange: {
-    hull: '#f28a00',
-    hullDark: '#b86600',
-    deck: '#f97316',
-    wings: '#c46f00',
-    highlight: '#ffbb55',
-    glow: 'rgba(242, 138, 0, 0.6)',
+    hull: "#f28a00",
+    hullDark: "#b86600",
+    deck: "#f97316",
+    wings: "#c46f00",
+    highlight: "#ffbb55",
+    glow: "rgba(242, 138, 0, 0.6)",
   },
   green: {
-    hull: '#16a34a',
-    hullDark: '#116d32',
-    deck: '#22c55e',
-    wings: '#127a37',
-    highlight: '#6ee7b7',
-    glow: 'rgba(22, 163, 74, 0.6)',
+    hull: "#16a34a",
+    hullDark: "#116d32",
+    deck: "#22c55e",
+    wings: "#127a37",
+    highlight: "#6ee7b7",
+    glow: "rgba(22, 163, 74, 0.6)",
   },
 };
