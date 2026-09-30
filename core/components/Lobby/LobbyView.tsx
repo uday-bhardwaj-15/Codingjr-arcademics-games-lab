@@ -7,6 +7,7 @@ import { GameManifest } from '../../types/match';
 import { soundManager } from '@/core/audio/soundManager';
 import { Chick } from '@/games/jumping-chicks/components/Chick';
 import { JetSkiAvatar } from '@/games/island-chase/components/JetSkiAvatar';
+import { SpaceShipAvatar } from '@/games/space-race/components/SpaceShipAvatar';
 import { Maximize2, Play } from 'lucide-react';
 
 interface LobbyViewProps {
@@ -150,6 +151,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({ manifest }) => {
               const isHuman = !p.isBot;
               const displayName = isHuman ? playerName : `Computer ${idx + 1}`;
               const isJetSki = manifest.id === 'island-chase';
+              const isSpaceRace = manifest.id === 'space-race';
 
               return (
                 <div
@@ -176,7 +178,12 @@ export const LobbyView: React.FC<LobbyViewProps> = ({ manifest }) => {
 
                   {/* Avatar Sprite */}
                   <div className="transform-gpu transition-transform hover:scale-105">
-                    {isJetSki ? (
+                    {isSpaceRace ? (
+                      <SpaceShipAvatar
+                        color={p.color}
+                        size="lg"
+                      />
+                    ) : isJetSki ? (
                       <JetSkiAvatar
                         color={p.color}
                         size="lg"

@@ -28,6 +28,14 @@ const IslandChaseGame = dynamic(
   { ssr: false }
 );
 
+const SpaceRaceGame = dynamic(
+  () =>
+    import('@/games/space-race/SpaceRaceGame').then(
+      (mod) => mod.SpaceRaceGame
+    ),
+  { ssr: false }
+);
+
 export default function GamePlayPage() {
   const params = useParams();
   const router = useRouter();
@@ -43,6 +51,10 @@ export default function GamePlayPage() {
 
   if (gameId === 'island-chase') {
     return <IslandChaseGame />;
+  }
+
+  if (gameId === 'space-race') {
+    return <SpaceRaceGame />;
   }
 
   return (

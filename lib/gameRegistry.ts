@@ -2,11 +2,13 @@ import { GameManifest } from '../core/types/match';
 import { jumpingChicksManifest } from '../games/jumping-chicks/manifest';
 import { alienAdditionManifest } from '../games/alien-addition/manifest';
 import { islandChaseManifest } from '../games/island-chase/manifest';
+import { spaceRaceManifest } from '../games/space-race/manifest';
 
 export const gameRegistry: GameManifest[] = [
   jumpingChicksManifest,
   alienAdditionManifest,
   islandChaseManifest,
+  spaceRaceManifest,
   {
     id: 'memory-match',
     title: 'Memory Match Safari',
