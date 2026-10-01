@@ -1,136 +1,230 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React, { useEffect, useId, useState } from "react";
+
+/**
+ * Compact boat wake.
+ *
+ * Why this replaces the old one:
+ * - 120 x 36 instead of 220 x 58 (scaled 1.15 on Y when surging). The old wake was almost as tall
+ *   as the lane pitch (64), so it spilled into the neighbouring lanes and overlapped their wakes.
+ *   This one stays within about +-18 px of the boat axis (+-26 px at max bend).
+ * - No dark "displacement shadow" (it made the water look dirty). Only white / cyan foam.
+ * - Stroke gradients use userSpaceOnUse. A bbox gradient on a near-horizontal stroke has ~0 height
+ *   and can render invisible.
+ * - Surge only stretches the wake in length (scaleX). `scale-x-130` is not a default Tailwind class,
+ *   so it is done with an inline transform.
+ * - Unique gradient ids per instance (useId), safe with 4 boats on screen and with SSR.
+ *
+ * Place it as a child of the boat group (so it follows x, y, yaw, bank and steering) and draw it
+ * below the hull. It is anchored just inside the stern (right edge = 96% of the boat width).
+ */
 
 interface WakeTrailProps {
   active?: boolean;
+  /** Boat is in a step surge: longer, brighter, thicker core. */
   isSurging?: boolean;
+  /**
+   * Swing of the wake tail in degrees, clamped to +-10. Positive = tail swings up.
+   * Use it when the boat moves sideways or yaws (lane change, turn): pass the OPPOSITE of the
+   * direction the boat is moving, e.g. boat steering down -> positive. Default 0.
+   */
+  bendDeg?: number;
+  /** Turn the foam motion off (it is also off for prefers-reduced-motion). */
+  animated?: boolean;
 }
 
-export function WakeTrail({ active = true, isSurging = false }: WakeTrailProps) {
+const W = 100;
+const H = 36;
+const CY = 18;
+
+export function WakeTrail({
+  active = true,
+  isSurging = false,
+  bendDeg = 0,
+  animated = true,
+}: WakeTrailProps) {
+  const uid = useId().replace(/:/g, "");
+  const [motionOk, setMotionOk] = useState(true);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setMotionOk(!mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
   if (!active) return null;
+
+  const run = animated && motionOk;
+  const bend = Math.max(-10, Math.min(10, bendDeg));
+  const coreW = isSurging ? 3.6 : 2.4;
+  const dashDur = isSurging ? "0.35s" : "0.6s";
+
+  const fan = `M ${W} ${CY - 7}
+    C 96 ${CY - 9}, 58 ${CY - 10}, 18 ${CY - 11}
+    Q 5 ${CY}, 18 ${CY + 11}
+    C 58 ${CY + 10}, 96 ${CY + 9}, ${W} ${CY + 7} Z`;
+
+  const edgeTop = `M ${W - 6} ${CY - 8} C 92 ${CY - 11}, 56 ${CY - 13}, 22 ${CY - 14}`;
+  const edgeBottom = `M ${W - 6} ${CY + 8} C 92 ${CY + 11}, 56 ${CY + 13}, 22 ${CY + 14}`;
+  const core1 = `M 114 ${CY - 1.5} C 92 ${CY - 1}, 58 ${CY}, 26 ${CY}`;
+  const core2 = `M 112 ${CY + 3.5} C 90 ${CY + 3}, 64 ${CY + 3.5}, 40 ${CY + 3}`;
 
   return (
     <div
-      className={`absolute right-[88%] top-1/2 -translate-y-1/2 w-44 h-16 pointer-events-none select-none overflow-visible transition-all duration-300 ${
-        isSurging ? 'scale-x-130 scale-y-115 opacity-100' : 'opacity-95'
-      }`}
+      aria-hidden
+      className="absolute right-[96%] top-1/2 pointer-events-none select-none overflow-visible"
+      style={{
+        width: W,
+        height: H,
+        transformOrigin: "100% 50%",
+        transform: `translateY(-50%) rotate(${-bend}deg) scaleX(${isSurging ? 1.35 : 1})`,
+        opacity: isSurging ? 1 : 0.92,
+        transition:
+          "transform 280ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 200ms ease-out",
+        willChange: "transform",
+      }}
     >
       <svg
-        viewBox="0 0 170 60"
-        className="w-full h-full overflow-visible drop-shadow-[0_2px_4px_rgba(14,116,144,0.35)]"
+        viewBox={`0 0 ${W} ${H}`}
+        width={W}
+        height={H}
+        className="overflow-visible"
       >
         <defs>
-          {/* Main White Foam Gradient (Stern -> Tail) */}
-          <linearGradient id="wakePlumeGrad" x1="100%" y1="0%" x2="0%" y2="0%">
-            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.95" />
-            <stop offset="25%" stopColor="#ffffff" stopOpacity="0.85" />
-            <stop offset="55%" stopColor="#e0f2fe" stopOpacity="0.55" />
-            <stop offset="85%" stopColor="#bae6fd" stopOpacity="0.25" />
-            <stop offset="100%" stopColor="#7dd3fc" stopOpacity="0" />
+          {/* Foam body: bright at the stern, fades into the water */}
+          <linearGradient id={`${uid}-fan`} x1="1" y1="0" x2="0" y2="0">
+            <stop offset="0" stopColor="#ffffff" stopOpacity="0.95" />
+            <stop offset="0.3" stopColor="#ecfdff" stopOpacity="0.72" />
+            <stop offset="0.65" stopColor="#aee9f7" stopOpacity="0.24" />
+            <stop offset="0.88" stopColor="#7fd8ef" stopOpacity="0.05" />
+            <stop offset="1" stopColor="#7fd8ef" stopOpacity="0" />
           </linearGradient>
-
-          {/* Jet Stream High Velocity Center Core */}
-          <linearGradient id="jetCoreGrad" x1="100%" y1="0%" x2="0%" y2="0%">
-            <stop offset="0%" stopColor="#ffffff" stopOpacity="1" />
-            <stop offset="40%" stopColor="#ffffff" stopOpacity="0.9" />
-            <stop offset="70%" stopColor="#e0f2fe" stopOpacity="0.4" />
-            <stop offset="100%" stopColor="#38bdf8" stopOpacity="0" />
+          {/* Strokes: userSpaceOnUse so thin horizontal lines still get a gradient */}
+          <linearGradient
+            id={`${uid}-line`}
+            gradientUnits="userSpaceOnUse"
+            x1={W}
+            y1="0"
+            x2="0"
+            y2="0"
+          >
+            <stop offset="0" stopColor="#ffffff" stopOpacity="0.95" />
+            <stop offset="0.55" stopColor="#ffffff" stopOpacity="0.5" />
+            <stop offset="1" stopColor="#ffffff" stopOpacity="0" />
           </linearGradient>
-
-          {/* Water Displacement Shadow underneath wake */}
-          <linearGradient id="waterDisplaceGrad" x1="100%" y1="0%" x2="0%" y2="0%">
-            <stop offset="0%" stopColor="#0e7490" stopOpacity="0.5" />
-            <stop offset="50%" stopColor="#0891b2" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="#0284c7" stopOpacity="0" />
-          </linearGradient>
-
-          {/* Outer Crest Wave Gradient */}
-          <linearGradient id="crestLineGrad" x1="100%" y1="0%" x2="0%" y2="0%">
-            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.9" />
-            <stop offset="35%" stopColor="#e0f2fe" stopOpacity="0.75" />
-            <stop offset="75%" stopColor="#7dd3fc" stopOpacity="0.35" />
-            <stop offset="100%" stopColor="#38bdf8" stopOpacity="0" />
+          <linearGradient
+            id={`${uid}-edge`}
+            gradientUnits="userSpaceOnUse"
+            x1={W}
+            y1="0"
+            x2="0"
+            y2="0"
+          >
+            <stop offset="0" stopColor="#d8f6ff" stopOpacity="0.8" />
+            <stop offset="0.6" stopColor="#9fe4f5" stopOpacity="0.35" />
+            <stop offset="1" stopColor="#9fe4f5" stopOpacity="0" />
           </linearGradient>
         </defs>
 
-        {/* 1. Underlying Water Displacement Shadow (gives depth to the churned water) */}
-        <path
-          d="M 165 30 Q 110 16, 40 8 L 0 6 L 0 54 L 40 52 Q 110 44, 165 30 Z"
-          fill="url(#waterDisplaceGrad)"
-        />
+        {/* 1. foam body (narrow V, widest point about 22 px) */}
+        <path d={fan} fill={`url(#${uid}-fan)`} />
 
-        {/* 2. Expanding Hydrodynamic V-Shaped Foam Plume */}
+        {/* 2. thin V edges that define the shape */}
         <path
-          d="M 165 30 C 140 22, 90 14, 15 10 C 5 10, 0 14, 0 18 C 30 26, 30 34, 0 42 C 0 46, 5 50, 15 50 C 90 46, 140 38, 165 30 Z"
-          fill="url(#wakePlumeGrad)"
-        />
-
-        {/* 3. Top Outer Curved Crest Wave Line */}
-        <path
-          d="M 165 26 C 130 18, 85 13, 0 12"
+          d={edgeTop}
           fill="none"
-          stroke="url(#crestLineGrad)"
-          strokeWidth={isSurging ? '4' : '3'}
+          stroke={`url(#${uid}-edge)`}
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
+        <path
+          d={edgeBottom}
+          fill="none"
+          stroke={`url(#${uid}-edge)`}
+          strokeWidth="1.5"
           strokeLinecap="round"
         />
 
-        {/* 4. Bottom Outer Curved Crest Wave Line */}
+        {/* 3. flowing foam streaks (dash offset runs toward the tail) */}
         <path
-          d="M 165 34 C 130 42, 85 47, 0 48"
+          d={core1}
           fill="none"
-          stroke="url(#crestLineGrad)"
-          strokeWidth={isSurging ? '4' : '3'}
+          stroke={`url(#${uid}-line)`}
+          strokeWidth={coreW}
           strokeLinecap="round"
-        />
-
-        {/* 5. Center High-Pressure Jet Core (Rooster tail stream) */}
+          strokeDasharray="16 9"
+        >
+          {run && (
+            <animate
+              attributeName="stroke-dashoffset"
+              from="0"
+              to="25"
+              dur={dashDur}
+              repeatCount="indefinite"
+            />
+          )}
+        </path>
         <path
-          d="M 168 30 C 135 29, 90 28, 20 30"
+          d={core2}
           fill="none"
-          stroke="url(#jetCoreGrad)"
-          strokeWidth={isSurging ? '6.5' : '4.5'}
+          stroke={`url(#${uid}-line)`}
+          strokeWidth={isSurging ? 2.2 : 1.5}
           strokeLinecap="round"
-        />
-
-        {/* 6. Inner Churning Foam Ribbons */}
-        <path
-          d="M 155 28 C 120 23, 75 22, 35 24"
-          fill="none"
-          stroke="#ffffff"
-          strokeWidth="2.5"
-          strokeLinecap="round"
+          strokeDasharray="10 8"
           opacity="0.85"
+        >
+          {run && (
+            <animate
+              attributeName="stroke-dashoffset"
+              from="0"
+              to="18"
+              dur={isSurging ? "0.45s" : "0.8s"}
+              repeatCount="indefinite"
+            />
+          )}
+        </path>
+
+        {/* 4. engine foam right behind the stern */}
+        <ellipse
+          cx="111"
+          cy={CY}
+          rx="9"
+          ry="6.5"
+          fill="#ffffff"
+          opacity="0.9"
         />
-        <path
-          d="M 155 32 C 120 37, 75 38, 35 36"
-          fill="none"
-          stroke="#ffffff"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          opacity="0.85"
+        <ellipse
+          cx="102"
+          cy={CY}
+          rx="11"
+          ry="4.5"
+          fill="#ffffff"
+          opacity="0.5"
         />
 
-        {/* 7. Natural Frothy Micro-Bubbles & Droplet Clusters (Graduating sizes from stern back) */}
-        {/* Near nozzle dense clusters */}
-        <circle cx="158" cy="27" r="3.2" fill="#ffffff" opacity="0.95" />
-        <circle cx="152" cy="33" r="2.8" fill="#ffffff" opacity="0.9" />
-        <circle cx="145" cy="28" r="3.5" fill="#ffffff" opacity="0.9" />
-        <circle cx="138" cy="34" r="3.2" fill="#e0f2fe" opacity="0.85" />
-
-        {/* Mid-wake dispersed bubbles */}
-        <circle cx="120" cy="24" r="3.5" fill="#ffffff" opacity="0.8" />
-        <circle cx="112" cy="36" r="3.8" fill="#ffffff" opacity="0.8" />
-        <circle cx="95" cy="27" r="4.2" fill="#e0f2fe" opacity="0.75" />
-        <circle cx="85" cy="35" r="3.6" fill="#e0f2fe" opacity="0.7" />
-        <circle cx="72" cy="22" r="3.2" fill="#bae6fd" opacity="0.65" />
-        <circle cx="65" cy="38" r="3.4" fill="#bae6fd" opacity="0.65" />
-
-        {/* Tail dissipating micro droplets */}
-        <circle cx="48" cy="26" r="2.8" fill="#bae6fd" opacity="0.5" />
-        <circle cx="38" cy="35" r="2.5" fill="#7dd3fc" opacity="0.45" />
-        <circle cx="22" cy="29" r="2.2" fill="#7dd3fc" opacity="0.35" />
-        <circle cx="10" cy="33" r="1.8" fill="#38bdf8" opacity="0.25" />
+        {/* 5. a few bubbles that twinkle */}
+        {[
+          [92, CY - 5, 1.6, 0],
+          [76, CY + 5, 1.3, 0.3],
+          [60, CY - 3, 1.8, 0.6],
+          [46, CY + 4, 1.2, 0.9],
+          [32, CY - 1, 1.4, 1.2],
+        ].map(([cx, cy, r, delay], i) => (
+          <circle key={i} cx={cx} cy={cy} r={r} fill="#ffffff" opacity="0.7">
+            {run && (
+              <animate
+                attributeName="opacity"
+                values="0.15;0.85;0.15"
+                dur="1.6s"
+                begin={`${delay}s`}
+                repeatCount="indefinite"
+              />
+            )}
+          </circle>
+        ))}
       </svg>
     </div>
   );
