@@ -44,10 +44,22 @@ const DragRaceGame = dynamic(
   { ssr: false }
 );
 
+const OrbitIntegersGame = dynamic(
+  () =>
+    import('@/games/orbit-integers/OrbitIntegersGame').then(
+      (mod) => mod.OrbitIntegersGame
+    ),
+  { ssr: false }
+);
+
 export default function GamePlayPage() {
   const params = useParams();
   const router = useRouter();
   const gameId = (params?.gameId as string) || 'jumping-chicks';
+
+  if (gameId === 'orbit-integers') {
+    return <OrbitIntegersGame />;
+  }
 
   if (gameId === 'jumping-chicks') {
     return <JumpingChicksGame />;

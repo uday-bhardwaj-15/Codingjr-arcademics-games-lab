@@ -22,6 +22,14 @@ const DragRaceGame = dynamic(
   { ssr: false }
 );
 
+const OrbitIntegersGame = dynamic(
+  () =>
+    import('@/games/orbit-integers/OrbitIntegersGame').then(
+      (mod) => mod.OrbitIntegersGame
+    ),
+  { ssr: false }
+);
+
 export default function GameLobbyPage() {
   const params = useParams();
   const router = useRouter();
@@ -45,6 +53,10 @@ export default function GameLobbyPage() {
   }
 
   // Games with integrated title/lobby/play flow
+  if (gameId === 'orbit-integers') {
+    return <OrbitIntegersGame />;
+  }
+
   if (gameId === 'drag-race') {
     return <DragRaceGame />;
   }

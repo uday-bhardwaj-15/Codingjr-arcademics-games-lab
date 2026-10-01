@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { Maximize2 } from 'lucide-react';
 import { GameWindow } from '@/core/components/GameWindow/GameWindow';
 import { useMatchStore } from '@/core/state/useMatchStore';
 import { ArcadeStorage } from '@/core/state/storage';
@@ -702,6 +703,14 @@ export function SpaceRaceGame() {
   const humanRate = calculateRate(humanShip.correctCount, humanFinishTime);
   const totalAttempted = humanShip.correctCount + humanShip.wrongCount + humanShip.timeoutCount;
 
+  const handleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen().catch(() => {});
+    }
+  };
+
   return (
     <div className="min-h-screen w-full bg-[#fbf7dc] text-slate-900 p-2 sm:p-4 flex flex-col items-center justify-center font-sans select-none">
       <div className="w-full max-w-[63.125rem] flex flex-col items-center space-y-2">
@@ -715,6 +724,15 @@ export function SpaceRaceGame() {
               Math Games, Multiplication Games
             </p>
           </div>
+
+          <button
+            onClick={handleFullscreen}
+            className="p-1.5 rounded-lg text-[#C05A00] hover:bg-amber-200/50 transition-colors cursor-pointer"
+            title="Toggle Fullscreen"
+            aria-label="Toggle Fullscreen"
+          >
+            <Maximize2 className="w-6 h-6" />
+          </button>
         </div>
 
         {/* 1010x577 Scaled Game Window Container */}

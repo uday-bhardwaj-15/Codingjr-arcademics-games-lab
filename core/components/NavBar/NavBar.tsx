@@ -82,6 +82,7 @@ export const NavBar: React.FC = () => {
     { grade: 'Grade 2 - 4', desc: 'Subtraction: Island Chase', href: '/games/island-chase' },
     { grade: 'Grade 3 - 5', desc: 'Multiplication: Space Race', href: '/games/space-race' },
     { grade: 'Grade 3 - 6', desc: 'Division: Drag Race Division', href: '/games/drag-race' },
+    { grade: 'Grade 5 - 8', desc: 'Integers: Orbit Integers', href: '/games/orbit-integers' },
   ];
 
   return (
@@ -235,6 +236,18 @@ export const NavBar: React.FC = () => {
             </div>
 
             {/* Direct Quick Game Links */}
+            <Link
+              href="/games/orbit-integers"
+              onClick={() => soundManager.playClick()}
+              className={`text-xs font-black px-3 py-1.5 rounded-lg border transition-colors ${
+                isGameActive('/games/orbit-integers')
+                  ? 'bg-amber-100 border-amber-300 text-[#f26522]'
+                  : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-amber-300 hover:text-[#f26522]'
+              }`}
+            >
+              Integers
+            </Link>
+
             <Link
               href="/games/drag-race"
               onClick={() => soundManager.playClick()}

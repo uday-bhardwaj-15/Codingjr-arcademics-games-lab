@@ -55,24 +55,32 @@ export function GameWindow({ children }: GameWindowProps) {
 
   useEffect(() => {
     const onFs = () => {
-      setReal(document.fullscreenElement === box.current);
+      setReal(Boolean(document.fullscreenElement));
     };
     document.addEventListener('fullscreenchange', onFs);
     return () => document.removeEventListener('fullscreenchange', onFs);
   }, []);
 
   useEffect(() => {
-    if (!pseudo) return;
+    if (!isFull) return;
+    const prevHtmlOverflow = document.documentElement.style.overflow;
+    const prevBodyOverflow = document.body.style.overflow;
+    document.documentElement.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
+
     const esc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setPseudo(false);
+      if (e.key === 'Escape') {
+        if (pseudo) setPseudo(false);
+      }
     };
     window.addEventListener('keydown', esc);
+
     return () => {
-      document.body.style.overflow = '';
+      document.documentElement.style.overflow = prevHtmlOverflow;
+      document.body.style.overflow = prevBodyOverflow;
       window.removeEventListener('keydown', esc);
     };
-  }, [pseudo]);
+  }, [isFull, pseudo]);
 
   const toggle = useCallback(async () => {
     if (pseudo) {
@@ -133,17 +141,17 @@ export function GameWindow({ children }: GameWindowProps) {
         <StageScale.Provider value={k}>{children}</StageScale.Provider>
       </div>
 
-      {/* Fullscreen Toggle Button */}
-      <button
-        onClick={toggle}
-        aria-label={isFull ? 'Exit fullscreen' : 'Fullscreen'}
-        title={isFull ? 'Exit fullscreen' : 'Toggle fullscreen'}
-        className={`absolute z-[110] grid h-10 w-10 place-items-center rounded-lg bg-[#FFE9A6] text-[#D9541E] hover:bg-[#ffe28a] active:scale-95 shadow-md transition-transform cursor-pointer ${
-          isFull ? 'right-4 top-4' : '-top-[3.25rem] right-0'
-        }`}
-      >
-        {isFull ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
-      </button>
+      {/* Exit Fullscreen Toggle Button (visible in fullscreen mode) */}
+      {isFull && (
+        <button
+          onClick={toggle}
+          aria-label="Exit fullscreen"
+          title="Exit fullscreen"
+          className="fixed right-4 top-4 z-[110] grid h-10 w-10 place-items-center rounded-lg bg-black/70 text-white hover:bg-black/90 active:scale-95 shadow-lg border border-white/20 transition-transform cursor-pointer"
+        >
+          <Minimize2 className="w-5 h-5" />
+        </button>
+      )}
 
       {/* Portrait Phone Orientation Hint */}
       {isPortraitMobile && !isFull && (

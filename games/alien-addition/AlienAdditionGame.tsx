@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { Maximize2 } from 'lucide-react';
 import { GamePhase, GameOptions, GameStats } from './types';
 import { DEFAULT_OPTIONS } from './constants';
 import { GameWindow } from '@/core/components/GameWindow/GameWindow';
@@ -97,10 +98,18 @@ export const AlienAdditionGame: React.FC = () => {
     setPhase('title');
   };
 
+  const handleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen().catch(() => {});
+    }
+  };
+
   return (
     <div className="min-h-screen w-full bg-[#FEFCBF] text-slate-900 p-2 sm:p-4 flex flex-col items-center justify-center font-sans select-none">
       <div className="w-full max-w-[63.125rem] flex flex-col items-center space-y-2">
-        {/* Top Header Bar (Using rem sizing) */}
+        {/* Top Header Bar */}
         <div className="w-full flex items-center justify-between px-1">
           <div>
             <h1 className="text-2xl sm:text-3xl font-normal text-[#C05A00] tracking-tight">
@@ -110,6 +119,15 @@ export const AlienAdditionGame: React.FC = () => {
               Math Games, Addition Games
             </p>
           </div>
+
+          <button
+            onClick={handleFullscreen}
+            className="p-1.5 rounded-lg text-[#C05A00] hover:bg-amber-200/50 transition-colors cursor-pointer"
+            title="Toggle Fullscreen"
+            aria-label="Toggle Fullscreen"
+          >
+            <Maximize2 className="w-6 h-6" />
+          </button>
         </div>
 
         {/* 1010x577 Scaled Game Window Container with integrated Fullscreen Button */}

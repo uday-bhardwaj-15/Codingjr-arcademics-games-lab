@@ -4,6 +4,7 @@ import { alienAdditionManifest } from '../games/alien-addition/manifest';
 import { islandChaseManifest } from '../games/island-chase/manifest';
 import { spaceRaceManifest } from '../games/space-race/manifest';
 import { dragRaceManifest } from '../games/drag-race/manifest';
+import { orbitIntegersManifest } from '../games/orbit-integers/manifest';
 
 export const gameRegistry: GameManifest[] = [
   jumpingChicksManifest,
@@ -11,6 +12,7 @@ export const gameRegistry: GameManifest[] = [
   islandChaseManifest,
   spaceRaceManifest,
   dragRaceManifest,
+  orbitIntegersManifest,
 ];
 
 export function getGameManifest(gameId: string): GameManifest | undefined {

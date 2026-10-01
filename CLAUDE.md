@@ -9,6 +9,7 @@
 | `island-chase` | Island Chase Subtraction | Subtraction | Versus (1 Human + 3 Bots) | Done v1.2 |
 | `space-race` | Space Race Multiplication | Multiplication | Versus (1 Human + 3 Bots) | Done v1.2 |
 | `drag-race` | Drag Race Division | Division | Versus (1 Human + 3 Bots) | Done v1.0 |
+| `orbit-integers` | Orbit Integers | Integers | Versus (1 Human + 3 Bots) | Done v1.0 |
 
 ---
 
@@ -31,13 +32,15 @@ src/
 │   ├── alien-addition/
 │   ├── island-chase/
 │   ├── space-race/
-│   └── drag-race/
+│   ├── drag-race/
+│   └── orbit-integers/
 │       ├── manifest.ts
-│       ├── DragRaceGame.tsx
+│       ├── OrbitIntegersGame.tsx
 │       ├── constants.ts
 │       ├── types.ts
-│       ├── engine/             # questionGenerator, __tests__
-│       └── components/         # DragCar, DragCarAvatar, DragTrack, DragTree, RaceHUD, DistanceBar, TitleScreen, NameScreen, LobbyScreen, ResultsScreen
+│       ├── engine/             # questionGenerator, course, raceMath, __tests__
+│       ├── components/         # SpaceScene, Pod, PodAvatar, LaunchTower, FinishRing, QuestionPanel, TrackMiniMap
+│       └── screens/            # NameScreen, OptionsScreen, LobbyScreen, ResultsScreen
 └── lib/
     ├── gameRegistry.ts
     └── subjects.ts
@@ -81,6 +84,7 @@ src/
 
 ## 4. Change Log
 
+- **Orbit Integers v1.0:** Integer arithmetic space race added (Subject: Integers). 4 pods (Blue Human + 3 Bots in Yellow, Red, Orange) drift at constant speed along a 3,000 px Catmull-Rom spline orbit path past planets and asteroids. Correct answers add +1 step (`200 px`), display position and heading smoothed with exponential decay, 120 px camera lookahead, 1.5s lockout on wrong answers with green answer hint, dynamic opponent gap pills (`▲ 2` / `▼ 1`), 2.5s post-human finish timer with projected bot times, and comprehensive 12,000+ case unit test suite.
 - **Demolition Division v1.0:** Division solo desert shooter game added. 6-stage 60s timed rounds, dual tank visual variants (red front-facing & yellow angled), telegraphed enemy shells with stun effect, ray-cast aiming and firing, barrel rotation with arrow keys or mouse click, question generation with exact division invariants, Try Again danger line pause, and full Results screen.
 - **Space Race v1.2:** Camera follows human at $x=300$, `CATCH_UP = false`, `STEP_PX = 180`, `LAP_LENGTH = 1800`, `S_FINISH = 5750`, all bots at 70% accuracy, persistent lane swapping, nozzle-anchored flame at `(10, 58)`, auto-fit hull plate, and 2.0s idle blip attention wave.
 - **Space Race v1.1:** Orbit look with rotating moon group and parallax sky layers about $C = (505, 2100)$, teal-grey moon surface with craters and crystals, polished ship art and avatar, moon-conforming sliced grandstands, lane steering with bank angle, answer arrows holding at $x=600$ above ships, and idle blip attention wave.

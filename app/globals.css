@@ -20,6 +20,16 @@ body {
   -webkit-user-select: none;
 }
 
+/* Hide scrollbars during fullscreen across all engines */
+:fullscreen,
+:-webkit-full-screen,
+html:fullscreen,
+body:fullscreen,
+html:has(:fullscreen),
+body:has(:fullscreen) {
+  overflow: hidden !important;
+}
+
 /* 1. Single Bounce on Load (Runs exactly once, never loops) */
 @keyframes chickSingleBounce {
   0% {
