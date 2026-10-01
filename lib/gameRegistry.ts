@@ -5,6 +5,7 @@ import { islandChaseManifest } from '../games/island-chase/manifest';
 import { spaceRaceManifest } from '../games/space-race/manifest';
 import { dragRaceManifest } from '../games/drag-race/manifest';
 import { orbitIntegersManifest } from '../games/orbit-integers/manifest';
+import { wordFrogManifest } from '../games/word-frog/manifest';
 
 export const gameRegistry: GameManifest[] = [
   jumpingChicksManifest,
@@ -13,6 +14,7 @@ export const gameRegistry: GameManifest[] = [
   spaceRaceManifest,
   dragRaceManifest,
   orbitIntegersManifest,
+  wordFrogManifest,
 ];
 
 export function getGameManifest(gameId: string): GameManifest | undefined {

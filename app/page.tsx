@@ -177,6 +177,66 @@ export default function ArcadeHome() {
         </svg>
       ),
     },
+    {
+      id: 'orbit-integers',
+      title: 'Orbit Integers',
+      shortTitle: 'Orbit Integers',
+      subject: 'integers',
+      subjectLabel: 'Integers',
+      grade: 'Grade 5 - 8',
+      href: '/games/orbit-integers',
+      description: 'Space race through deep cosmos! Solve integer equations to drift and surge past rivals to the finish ring gate.',
+      renderArt: () => (
+        <svg viewBox="0 0 200 160" className="w-full h-full">
+          <rect width="200" height="160" fill="#02082e" />
+          <circle cx="30" cy="25" r="1.5" fill="#fff" />
+          <circle cx="170" cy="35" r="1.5" fill="#fff" />
+          <circle cx="140" cy="70" r="22" fill="#7c3aed" />
+          {/* Cyan/Blue Pod */}
+          <g transform="translate(50, 60) scale(0.65)">
+            <ellipse cx="85" cy="55" rx="55" ry="28" fill="#1f6fe0" stroke="#0a2a6e" strokeWidth="3" />
+            <circle cx="100" cy="55" r="14" fill="#38bdf8" />
+            <circle cx="98" cy="53" r="4" fill="#0f172a" />
+          </g>
+        </svg>
+      ),
+    },
+    {
+      id: 'word-frog',
+      title: 'Word Frog',
+      shortTitle: 'Word Frog',
+      subject: 'language-arts',
+      subjectLabel: 'Language Arts',
+      grade: 'Grade 2 - 5',
+      href: '/games/word-frog',
+      description: 'Feed the hungry frog by catching dragonflies with matching antonyms, synonyms, and homophones!',
+      renderArt: () => (
+        <svg viewBox="0 0 200 160" className="w-full h-full">
+          {/* Pond */}
+          <rect width="200" height="160" fill="#74b9d8" />
+          {/* Lily Pad */}
+          <circle cx="100" cy="95" r="50" fill="#84cc16" stroke="#3f6212" strokeWidth="3" />
+          {/* Cute Green Frog */}
+          <g transform="translate(72, 60) scale(0.6)">
+            <ellipse cx="50" cy="45" rx="36" ry="26" fill="#22c55e" stroke="#15803d" strokeWidth="2.5" />
+            <circle cx="34" cy="22" r="11" fill="#16a34a" />
+            <circle cx="34" cy="22" r="8" fill="#ffffff" /><circle cx="34" cy="22" r="4" fill="#000" />
+            <circle cx="66" cy="22" r="11" fill="#16a34a" />
+            <circle cx="66" cy="22" r="8" fill="#ffffff" /><circle cx="66" cy="22" r="4" fill="#000" />
+            <path d="M 35 48 Q 50 58 65 48" stroke="#15803d" strokeWidth="2.5" fill="none" />
+          </g>
+          {/* Dragonflies */}
+          <g transform="translate(25, 30) scale(0.4)">
+            <ellipse cx="30" cy="30" rx="20" ry="6" fill="#bae6fd" opacity="0.8" />
+            <circle cx="30" cy="30" r="6" fill="#0f172a" />
+          </g>
+          <g transform="translate(150, 45) scale(0.4)">
+            <ellipse cx="30" cy="30" rx="20" ry="6" fill="#bae6fd" opacity="0.8" />
+            <circle cx="30" cy="30" r="6" fill="#0f172a" />
+          </g>
+        </svg>
+      ),
+    },
   ];
 
   const filteredGames =
@@ -198,7 +258,7 @@ export default function ArcadeHome() {
               Fun Learning
             </h1>
             <p className="text-sm sm:text-base text-slate-200 font-medium leading-relaxed max-w-lg">
-              Learn math facts quickly and boost student engagement with our free skill-building multiplayer math games & races!
+              Learn math & language arts facts quickly and boost student engagement with our free skill-building arcade games!
             </p>
 
             {/* Big Chevron PLAY Button */}
@@ -280,6 +340,8 @@ export default function ArcadeHome() {
         <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
           {[
             { id: 'all', label: 'All Games' },
+            { id: 'language-arts', label: 'Language Arts' },
+            { id: 'integers', label: 'Integers' },
             { id: 'division', label: 'Division' },
             { id: 'multiplication', label: 'Multiplication' },
             { id: 'subtraction', label: 'Subtraction' },

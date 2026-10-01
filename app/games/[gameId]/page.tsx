@@ -30,6 +30,14 @@ const OrbitIntegersGame = dynamic(
   { ssr: false }
 );
 
+const WordFrogGame = dynamic(
+  () =>
+    import('@/games/word-frog/WordFrogGame').then(
+      (mod) => mod.WordFrogGame
+    ),
+  { ssr: false }
+);
+
 export default function GameLobbyPage() {
   const params = useParams();
   const router = useRouter();
@@ -53,6 +61,10 @@ export default function GameLobbyPage() {
   }
 
   // Games with integrated title/lobby/play flow
+  if (gameId === 'word-frog') {
+    return <WordFrogGame />;
+  }
+
   if (gameId === 'orbit-integers') {
     return <OrbitIntegersGame />;
   }

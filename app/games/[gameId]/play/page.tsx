@@ -52,10 +52,22 @@ const OrbitIntegersGame = dynamic(
   { ssr: false }
 );
 
+const WordFrogGame = dynamic(
+  () =>
+    import('@/games/word-frog/WordFrogGame').then(
+      (mod) => mod.WordFrogGame
+    ),
+  { ssr: false }
+);
+
 export default function GamePlayPage() {
   const params = useParams();
   const router = useRouter();
   const gameId = (params?.gameId as string) || 'jumping-chicks';
+
+  if (gameId === 'word-frog') {
+    return <WordFrogGame />;
+  }
 
   if (gameId === 'orbit-integers') {
     return <OrbitIntegersGame />;
