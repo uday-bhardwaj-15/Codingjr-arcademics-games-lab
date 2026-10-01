@@ -55,66 +55,111 @@ export const QuestionPanel: React.FC<QuestionPanelProps> = ({
   }, [disabled, isLocked, question, handleSelect]);
 
   return (
-    <div className="absolute left-1/2 -translate-x-1/2 bottom-0 w-[98%] max-w-[980px] h-[160px] bg-[#8892a6]/95 backdrop-blur-md rounded-t-2xl border-t-2 border-x-2 border-white/30 shadow-[0_-10px_35px_rgba(0,0,0,0.6)] z-20 flex items-center justify-between px-4 sm:px-6 select-none">
-      {/* 1. Left: Player Avatar & Name */}
-      <div className="flex flex-col items-center justify-center w-24 sm:w-28 shrink-0 -mt-2">
-        <PodAvatar color={playerColor} size="md" />
-        <span className="text-white font-black text-xs sm:text-sm tracking-wide mt-1 drop-shadow-md text-center truncate max-w-[110px]">
-          {playerName}
-        </span>
-      </div>
-
-      {/* 2. Middle: Black Question Box + 4 Blue Answer Buttons */}
-      <div className="flex-1 flex flex-col items-center justify-center max-w-[460px] mx-2 sm:mx-4 space-y-2.5">
-        {/* Question Box (Black with neon cyan/blue border) */}
-        <div className="relative w-full h-[58px] bg-black/95 rounded-lg border-2 border-[#0ea5e9] shadow-[0_0_15px_rgba(14,165,233,0.4)] flex items-center justify-center px-4">
-          <span className="absolute top-1 left-2.5 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400">
-            QUESTION {questionNumber}
-          </span>
-          <span className="text-2xl sm:text-3xl md:text-4xl font-black tracking-wider text-white font-mono drop-shadow-[0_2px_8px_rgba(255,255,255,0.4)]">
-            {question ? question.prompt : '...'}
+    <div className="absolute bottom-0 left-0 right-0 h-[174px] z-25 px-4 pb-3 flex items-end justify-between select-none pointer-events-none">
+      {/* 1. Left: Player Pod Avatar + Navy Name Pill */}
+      <div className="relative z-10 flex flex-col items-center justify-end w-[130px] pb-1 pointer-events-auto">
+        <div className="transition-transform duration-200 hover:scale-105 drop-shadow-[0_6px_12px_rgba(0,0,0,0.35)]">
+          <PodAvatar color={playerColor} size="md" />
+        </div>
+        <div className="mt-1 px-4 py-1 rounded-full bg-[#14336f] border-2 border-[#38bdf8]/70 shadow-[0_3px_10px_rgba(0,0,0,0.4)]">
+          <span className="font-extrabold text-sm text-white tracking-wide truncate max-w-[100px] block text-center">
+            {playerName}
           </span>
         </div>
+      </div>
 
-        {/* 4 Answer Buttons Row */}
-        <div className="grid grid-cols-4 gap-2 sm:gap-3 w-full">
+      {/* 2. Center: Glossy Blue Question Panel (584 x 156) */}
+      <div
+        className="relative z-10 w-[584px] h-[156px] mx-auto rounded-[24px] p-2.5 flex flex-col justify-between pointer-events-auto"
+        style={{
+          background: 'linear-gradient(180deg, #1a5fd0 0%, #0d3fb0 100%)',
+          border: '3px solid #c8f5ff',
+          boxShadow: '0 0 24px #8be8f7, 0 8px 24px rgba(0, 0, 0, 0.4)',
+        }}
+      >
+        {/* Top: Dark Navy Question Header */}
+        <div
+          className="relative h-[48px] w-full rounded-xl flex items-center justify-center px-4 overflow-hidden"
+          style={{
+            background: 'linear-gradient(180deg, #0a2a72 0%, #123f98 100%)',
+            border: '1px solid rgba(190, 225, 255, 0.4)',
+          }}
+        >
+          {/* Top gloss highlight on header */}
+          <div className="absolute top-0 inset-x-0 h-[40%] bg-gradient-to-b from-white/20 to-transparent pointer-events-none" />
+
+          {/* "QUESTION n" small top-left badge */}
+          <span className="absolute top-2 left-3 text-[11px] font-black uppercase tracking-wider text-[#bcd8ff]">
+            QUESTION {questionNumber}
+          </span>
+
+          {/* Centered Equation / Feedback */}
+          {isLocked && correctOptionIndex !== null ? (
+            <span className="text-2xl sm:text-3xl font-black text-rose-400 animate-bounce tracking-wide">
+              Oops! Try again
+            </span>
+          ) : (
+            <span className="text-3xl sm:text-4xl font-extrabold tracking-widest text-white">
+              {question ? question.prompt : '...'}
+            </span>
+          )}
+        </div>
+
+        {/* Bottom: 4 Glossy Blue Answer Buttons */}
+        <div className="grid grid-cols-4 gap-2.5 h-[66px]">
           {question?.options.map((opt, idx) => {
             const isSelected = selectedOptionIndex === idx;
             const isTargetCorrect = correctOptionIndex === idx || (isLocked && opt.isCorrect);
             const isWrongSelection = isSelected && !opt.isCorrect;
 
-            let btnStyle =
-              'bg-gradient-to-b from-[#1f6fe0] to-[#0b4fb8] border-[#3b82f6] text-white hover:brightness-110 active:scale-95 shadow-[0_4px_12px_rgba(15,23,42,0.5)]';
+            let btnBg = 'linear-gradient(180deg, #2f7ff5 0%, #1352cc 100%)';
+            let btnBorder = '2px solid rgba(190, 225, 255, 0.9)';
+            let btnShadow = '0 4px 10px rgba(0, 0, 0, 0.35)';
 
             if (isWrongSelection) {
-              btnStyle =
-                'bg-gradient-to-b from-red-600 to-rose-800 border-red-400 text-white animate-shake shadow-[0_0_15px_#ef4444]';
+              btnBg = 'linear-gradient(180deg, #e74c3c 0%, #c0392b 100%)';
+              btnBorder = '2px solid #fca5a5';
+              btnShadow = '0 0 16px rgba(231, 76, 60, 0.8)';
             } else if (isTargetCorrect && isLocked) {
-              btnStyle =
-                'bg-gradient-to-b from-emerald-500 to-green-700 border-emerald-300 text-white shadow-[0_0_20px_#22c55e] animate-pulse';
+              btnBg = 'linear-gradient(180deg, #2ecc71 0%, #27ae60 100%)';
+              btnBorder = '2px solid #a3f7bf';
+              btnShadow = '0 0 16px rgba(46, 204, 113, 0.8)';
             }
 
             return (
               <button
-                key={opt.id}
-                onClick={() => handleSelect(idx)}
+                key={opt.id || idx}
                 disabled={disabled || isLocked}
-                className={`relative h-12 sm:h-14 rounded-md border-2 font-black text-xl sm:text-2xl flex items-center justify-center transition-all duration-100 cursor-pointer disabled:cursor-not-allowed ${btnStyle}`}
+                onClick={() => handleSelect(idx)}
+                style={{
+                  background: btnBg,
+                  border: btnBorder,
+                  boxShadow: btnShadow,
+                }}
+                className="relative rounded-xl text-white font-black flex items-center justify-center transition-all duration-150 cursor-pointer disabled:cursor-default disabled:opacity-60 active:translate-y-0.5 hover:brightness-105 overflow-hidden"
               >
-                {/* Index marker top-left */}
-                <span className="absolute top-0.5 left-1.5 text-[10px] font-extrabold opacity-70">
+                {/* Top Gloss Highlight curve */}
+                <div className="absolute top-0 inset-x-0 h-[45%] bg-gradient-to-b from-white/40 to-transparent rounded-t-xl pointer-events-none" />
+
+                {/* "1." to "4." Key Indicator top-left */}
+                <span className="absolute top-1.5 left-2 text-[11px] font-bold text-[#bcd8ff]">
                   {idx + 1}.
                 </span>
-                {/* Answer value (formatted with real minus if negative) */}
-                <span>{opt.value < 0 ? `−${Math.abs(opt.value)}` : opt.value}</span>
+
+                {/* Big Crisp White Answer Number */}
+                <span className="text-2xl sm:text-3xl font-black text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
+                  {opt.value < 0 ? `−${Math.abs(opt.value)}` : opt.value}
+                </span>
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* 3. Right: PROGRESS Badge + Enlarged Track Mini-Map (Matching Screenshot) */}
-      <TrackMiniMap pods={pods} correctCount={correctCount} />
+      {/* 3. Right: Floating Minimap Card */}
+      <div className="relative z-10 flex items-center justify-center pr-1 pb-1 pointer-events-auto">
+        <TrackMiniMap pods={pods} correctCount={correctCount} />
+      </div>
     </div>
   );
 };

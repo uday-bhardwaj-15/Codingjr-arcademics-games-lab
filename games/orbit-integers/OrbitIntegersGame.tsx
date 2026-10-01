@@ -205,11 +205,11 @@ export const OrbitIntegersGame: React.FC = () => {
     setPods(freshPods);
     podsRef.current = freshPods;
 
-    // Reset camera to launch tower
+    // Reset camera to launch tower (raised framing so all 4 lanes are fully visible above HUD)
     const startCoursePt = getCoursePointAt(0);
     cameraRef.current = {
       x: startCoursePt.x + 120 - DESIGN_W / 2,
-      y: startCoursePt.y - DESIGN_H / 2,
+      y: startCoursePt.y - (DESIGN_H / 2 - 50),
     };
     setCamera({ ...cameraRef.current });
 
@@ -418,7 +418,7 @@ export const OrbitIntegersGame: React.FC = () => {
         const lookAheadY = Math.sin(human.heading) * 120;
 
         const targetCamX = humanPt.x + lookAheadX - DESIGN_W / 2;
-        const targetCamY = humanPt.y + lookAheadY - DESIGN_H / 2;
+        const targetCamY = humanPt.y + lookAheadY - (DESIGN_H / 2 - 50);
 
         cameraRef.current.x += (targetCamX - cameraRef.current.x) * (1 - Math.exp(-dt / 0.35));
         cameraRef.current.y += (targetCamY - cameraRef.current.y) * (1 - Math.exp(-dt / 0.35));

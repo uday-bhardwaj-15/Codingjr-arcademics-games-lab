@@ -5,20 +5,20 @@ export const STEP_PX = 200;
 export const COURSE_LENGTH = STEPS_TO_FINISH * STEP_PX; // 3000 px
 
 export const DRIFT_PX_PER_S: Record<GameSpeed, number> = {
-  slow: 14,
-  normal: 20,
-  fast: 28,
+  slow: 24,
+  normal: 36,
+  fast: 50,
 };
 
 export const SPEED_REACTION_MULTIPLIERS: Record<GameSpeed, number> = {
-  slow: 1.3,
-  normal: 1.0,
-  fast: 0.75,
+  slow: 0.95,
+  normal: 0.7,
+  fast: 0.48,
 };
 
 export const WRONG_LOCK_MS = 1500;
 
-export const LANE_OFFSETS = [-114, -38, 38, 114]; // px normal offset along course (generous clearance to prevent any overlap)
+export const LANE_OFFSETS = [-72, -24, 24, 72]; // px normal offset along course (guarantees all 4 pods are fully visible & unobstructed)
 
 export const DEFAULT_SETTINGS: IntegerSettings = {
   from: -10,
@@ -29,9 +29,9 @@ export const DEFAULT_SETTINGS: IntegerSettings = {
 };
 
 export const BOT_CONFIGS = [
-  { name: 'Computer 2', color: 'yellow' as PlayerColor, accuracy: 0.85, reactionRange: [4000, 7500] as [number, number] },
-  { name: 'Computer 3', color: 'red' as PlayerColor, accuracy: 0.80, reactionRange: [3500, 7000] as [number, number] },
-  { name: 'Computer 4', color: 'orange' as PlayerColor, accuracy: 0.90, reactionRange: [4500, 8000] as [number, number] },
+  { name: 'Computer 2', color: 'yellow' as PlayerColor, accuracy: 0.85, reactionRange: [3000, 5200] as [number, number] },
+  { name: 'Computer 3', color: 'red' as PlayerColor, accuracy: 0.80, reactionRange: [2600, 4800] as [number, number] },
+  { name: 'Computer 4', color: 'orange' as PlayerColor, accuracy: 0.90, reactionRange: [3200, 5600] as [number, number] },
 ];
 
 export const POD_COLORS: Record<
