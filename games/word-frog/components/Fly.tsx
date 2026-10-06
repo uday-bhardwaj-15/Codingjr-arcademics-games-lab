@@ -12,6 +12,8 @@ interface FlyProps {
   mouthPosition?: { x: number; y: number };
   isWrongHit?: boolean;
   isLocked?: boolean;
+  isHighlighted?: boolean;
+  isDull?: boolean;
   onClick: () => void;
 }
 
@@ -27,6 +29,8 @@ export const Fly: React.FC<FlyProps> = ({
   mouthPosition = { x: 505, y: 185 },
   isWrongHit = false,
   isLocked = false,
+  isHighlighted = false,
+  isDull = false,
   onClick,
 }) => {
   // Stagger animation timing so each fly hovers uniquely
@@ -113,6 +117,16 @@ export const Fly: React.FC<FlyProps> = ({
             opacity: 1;
           }
         }
+        @keyframes targetHighlightPulse {
+          0%, 100% {
+            box-shadow: 0 0 0 3px #fde047, 0 0 26px rgba(250, 204, 21, 0.9), 0 8px 24px rgba(0,0,0,0.6);
+            transform: scale(1.04);
+          }
+          50% {
+            box-shadow: 0 0 0 5px #facc15, 0 0 38px rgba(250, 204, 21, 1), 0 10px 28px rgba(0,0,0,0.7);
+            transform: scale(1.09);
+          }
+        }
         .fly-float-${positionIndex} {
           animation: flyFloat_${positionIndex} 3.2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
           animation-delay: ${animDelay}s;
@@ -124,21 +138,32 @@ export const Fly: React.FC<FlyProps> = ({
         .fly-spawn-anim {
           animation: flySpawn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
+        .target-highlight-anim {
+          animation: targetHighlightPulse 1.4s ease-in-out infinite;
+        }
       `}</style>
 
       <div
         onClick={() => {
           if (!isLocked) onClick();
         }}
-        className={`absolute z-20 select-none cursor-pointer flex flex-col items-center justify-center fly-float-${positionIndex} group ${
-          isLocked ? 'cursor-not-allowed opacity-90' : 'hover:z-30'
+        className={`absolute z-20 select-none cursor-pointer flex flex-col items-center justify-center fly-float-${positionIndex} group transition-all duration-300 ${
+          isDull
+            ? 'opacity-30 grayscale-[70%] scale-95 pointer-events-auto'
+            : isHighlighted
+            ? 'z-40 scale-105'
+            : isLocked
+            ? 'cursor-not-allowed opacity-90'
+            : 'hover:z-30'
         }`}
         style={{
           left: `${x}px`,
           top: `${y}px`,
         }}
       >
-        <div className="flex flex-col items-center justify-center fly-spawn-anim transition-transform duration-200 group-hover:scale-105 active:scale-95">
+        <div className={`flex flex-col items-center justify-center fly-spawn-anim transition-transform duration-200 ${
+          !isHighlighted ? 'group-hover:scale-105 active:scale-95' : ''
+        }`}>
           {/* Dragonfly SVG Art with Fluttering Wings (Neat and Compact) */}
           <div className="relative w-24 h-16 flex items-center justify-center pointer-events-none drop-shadow-md">
             <svg viewBox="0 0 160 110" className="w-full h-full overflow-visible">
@@ -241,17 +266,27 @@ export const Fly: React.FC<FlyProps> = ({
 
           {/* Glossy Blue Word Box Card */}
           <div
-            className={`-mt-1 px-4 py-2 min-w-[130px] sm:min-w-[145px] max-w-[185px] rounded-xl flex items-center justify-center relative shadow-xl transition-all duration-200 overflow-hidden ${
-              isWrongHit
+            className={`-mt-1 px-4 py-2 min-w-[130px] sm:min-w-[145px] max-w-[185px] rounded-xl flex items-center justify-center relative shadow-xl transition-all duration-200 overflow-visible ${
+              isHighlighted
+                ? 'target-highlight-anim'
+                : isWrongHit
                 ? 'animate-shake'
                 : 'group-hover:shadow-[0_0_20px_rgba(56,189,248,0.7)] group-hover:border-cyan-200'
             }`}
             style={{
-              background: isWrongHit
+              background: isHighlighted
+                ? 'linear-gradient(180deg, #1d4ed8 0%, #1e3a8a 100%)'
+                : isWrongHit
                 ? 'linear-gradient(180deg, #d97706 0%, #b45309 100%)'
                 : 'linear-gradient(180deg, #2b7af0 0%, #114ec4 100%)',
-              border: isWrongHit ? '2.5px solid #fde68a' : '2.5px solid #c8f5ff',
-              boxShadow: isWrongHit
+              border: isHighlighted
+                ? '3.5px solid #facc15'
+                : isWrongHit
+                ? '2.5px solid #fde68a'
+                : '2.5px solid #c8f5ff',
+              boxShadow: isHighlighted
+                ? undefined // handled by keyframes
+                : isWrongHit
                 ? '0 0 22px rgba(245, 158, 11, 0.7), 0 6px 14px rgba(0,0,0,0.5)'
                 : '0 0 16px rgba(100, 200, 255, 0.45), 0 6px 14px rgba(0,0,0,0.5)',
             }}
@@ -260,7 +295,9 @@ export const Fly: React.FC<FlyProps> = ({
             <div className="absolute top-0 inset-x-0 h-[45%] bg-gradient-to-b from-white/35 to-transparent rounded-t-xl pointer-events-none" />
 
             {/* Keyboard Shortcut Number Indicator */}
-            <span className="absolute top-1 left-2 text-[11px] font-black text-[#bcd8ff] drop-shadow-sm">
+            <span className={`absolute top-1 left-2 text-[11px] font-black drop-shadow-sm ${
+              isHighlighted ? 'text-amber-300' : 'text-[#bcd8ff]'
+            }`}>
               {keyNum}.
             </span>
 

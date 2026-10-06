@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 
 interface FrogProps {
   promptWord: string;
@@ -27,18 +27,6 @@ export const Frog: React.FC<FrogProps> = ({
   const mouthX = frogCenterX;
   const mouthY = 185;
 
-  // Eye Blinking State
-  const [isBlinking, setIsBlinking] = useState(false);
-
-  useEffect(() => {
-    const blinkInterval = setInterval(() => {
-      setIsBlinking(true);
-      setTimeout(() => setIsBlinking(false), 160);
-    }, 3800 + Math.random() * 2000);
-
-    return () => clearInterval(blinkInterval);
-  }, []);
-
   // Compute tongue tip position
   let tongueTipX = mouthX;
   let tongueTipY = mouthY;
@@ -62,19 +50,24 @@ export const Frog: React.FC<FrogProps> = ({
   const ctrlX = midX + perpX * whipAmplitude;
   const ctrlY = midY + perpY * whipAmplitude;
 
-  // Calculate eye look angle: prioritizes active target fly, otherwise tracks live mouse cursor!
-  let lookAngleDeg = 0;
-  let lookDistance = 0;
+  // Calculate eye look angle: prioritizes active target fly, otherwise smoothly tracks live mouse cursor
+  let pupilOffsetX = 0;
+  let pupilOffsetY = 0;
 
   if (targetPosition) {
-    lookAngleDeg = (Math.atan2(targetPosition.y - mouthY, targetPosition.x - mouthX) * 180) / Math.PI;
-    lookDistance = 6.0;
+    const angle = Math.atan2(targetPosition.y - mouthY, targetPosition.x - mouthX);
+    pupilOffsetX = Math.cos(angle) * 5.5;
+    pupilOffsetY = Math.sin(angle) * 5.5;
   } else if (mousePosition) {
     const mDx = mousePosition.x - mouthX;
-    const mDy = mousePosition.y - (mouthY - 20); // Track slightly above mouth (eye level)
+    const mDy = mousePosition.y - (mouthY - 20);
     const mDist = Math.hypot(mDx, mDy);
-    lookAngleDeg = (Math.atan2(mDy, mDx) * 180) / Math.PI;
-    lookDistance = Math.min(6.5, Math.max(1.5, mDist * 0.022));
+    if (mDist > 10) {
+      const angle = Math.atan2(mDy, mDx);
+      const lookDist = Math.min(5.5, mDist * 0.02);
+      pupilOffsetX = Math.cos(angle) * lookDist;
+      pupilOffsetY = Math.sin(angle) * lookDist;
+    }
   }
 
   return (
@@ -85,7 +78,7 @@ export const Frog: React.FC<FrogProps> = ({
             transform: scale(1) translateY(0);
           }
           50% {
-            transform: scale(1.025, 0.975) translateY(1px);
+            transform: scale(1.02, 0.98) translateY(1px);
           }
         }
         @keyframes throatPulse {
@@ -93,7 +86,7 @@ export const Frog: React.FC<FrogProps> = ({
             transform: scale(1);
           }
           50% {
-            transform: scale(1.08, 1.05);
+            transform: scale(1.06, 1.04);
           }
         }
         @keyframes chewMouth {
@@ -246,7 +239,7 @@ export const Frog: React.FC<FrogProps> = ({
             className="drop-shadow-lg"
           />
 
-          {/* Impact starburst ring when near peak (Golden & Cyan sparkle, no red) */}
+          {/* Impact starburst ring when near peak */}
           {tongueProgress > 0.88 && (
             <circle
               cx={tongueTipX}
@@ -343,7 +336,7 @@ export const Frog: React.FC<FrogProps> = ({
               {/* Main Frog Body */}
               <ellipse cx="100" cy="85" rx="68" ry="48" fill="url(#frogSkinGrad)" stroke="#14532d" strokeWidth="3.5" />
 
-              {/* Pulsing Throat (Gulp / Breathing) */}
+              {/* Pulsing Throat */}
               <ellipse
                 cx="100"
                 cy="85"
@@ -360,36 +353,40 @@ export const Frog: React.FC<FrogProps> = ({
               <circle cx="80" cy="106" r="4.5" fill="#15803d" opacity="0.5" />
               <circle cx="120" cy="106" r="4.5" fill="#15803d" opacity="0.5" />
 
-              {/* Big Expressive Frog Eyes with Mouse Cursor Tracking */}
+              {/* Big Expressive Cute Frog Eyes */}
               {/* Left Eye */}
               <g transform="translate(68, 32)">
                 <circle cx="0" cy="0" r="22" fill="#16a34a" stroke="#14532d" strokeWidth="3" />
                 <circle cx="0" cy="0" r="17" fill="#ffffff" stroke="#0f172a" strokeWidth="1.5" />
 
-                {/* Left Pupil with Smooth Tracking */}
-                {isBlinking ? (
-                  <line x1="-12" y1="0" x2="12" y2="0" stroke="#14532d" strokeWidth="3.5" strokeLinecap="round" />
-                ) : status === 'miss' ? (
-                  // Cartoon dizzy spiral/question eyes on miss (no harsh red)
+                {status === 'miss' ? (
+                  // Cartoon dizzy eyes on miss
                   <g stroke="#0f172a" strokeWidth="2.5" strokeLinecap="round">
-                    <circle cx="0" cy="0" r="5" fill="none" stroke="#6366f1" strokeWidth="2" />
-                    <circle cx="0" cy="0" r="2" fill="#0f172a" />
+                    <circle cx="0" cy="0" r="6" fill="none" stroke="#6366f1" strokeWidth="2" />
+                    <circle cx="0" cy="0" r="2.5" fill="#0f172a" />
                   </g>
                 ) : (
                   <>
+                    {/* Big Dark Pupil */}
                     <circle
-                      cx={Math.cos((lookAngleDeg * Math.PI) / 180) * lookDistance}
-                      cy={Math.sin((lookAngleDeg * Math.PI) / 180) * lookDistance}
-                      r="8"
+                      cx={pupilOffsetX}
+                      cy={pupilOffsetY}
+                      r="8.5"
                       fill="#0f172a"
-                      style={{ transition: 'cx 0.05s ease-out, cy 0.05s ease-out' }}
                     />
+                    {/* Top Specular Catchlight */}
                     <circle
-                      cx={Math.cos((lookAngleDeg * Math.PI) / 180) * lookDistance - 2.5}
-                      cy={Math.sin((lookAngleDeg * Math.PI) / 180) * lookDistance - 2.5}
-                      r="2.8"
+                      cx={pupilOffsetX - 2.5}
+                      cy={pupilOffsetY - 2.5}
+                      r="3.2"
                       fill="#ffffff"
-                      style={{ transition: 'cx 0.05s ease-out, cy 0.05s ease-out' }}
+                    />
+                    {/* Secondary Bottom Catchlight */}
+                    <circle
+                      cx={pupilOffsetX + 2.5}
+                      cy={pupilOffsetY + 2.5}
+                      r="1.5"
+                      fill="#ffffff"
                     />
                   </>
                 )}
@@ -400,30 +397,34 @@ export const Frog: React.FC<FrogProps> = ({
                 <circle cx="0" cy="0" r="22" fill="#16a34a" stroke="#14532d" strokeWidth="3" />
                 <circle cx="0" cy="0" r="17" fill="#ffffff" stroke="#0f172a" strokeWidth="1.5" />
 
-                {/* Right Pupil with Smooth Tracking */}
-                {isBlinking ? (
-                  <line x1="-12" y1="0" x2="12" y2="0" stroke="#14532d" strokeWidth="3.5" strokeLinecap="round" />
-                ) : status === 'miss' ? (
+                {status === 'miss' ? (
                   // Cartoon dizzy eyes on miss
                   <g stroke="#0f172a" strokeWidth="2.5" strokeLinecap="round">
-                    <circle cx="0" cy="0" r="5" fill="none" stroke="#6366f1" strokeWidth="2" />
-                    <circle cx="0" cy="0" r="2" fill="#0f172a" />
+                    <circle cx="0" cy="0" r="6" fill="none" stroke="#6366f1" strokeWidth="2" />
+                    <circle cx="0" cy="0" r="2.5" fill="#0f172a" />
                   </g>
                 ) : (
                   <>
+                    {/* Big Dark Pupil */}
                     <circle
-                      cx={Math.cos((lookAngleDeg * Math.PI) / 180) * lookDistance}
-                      cy={Math.sin((lookAngleDeg * Math.PI) / 180) * lookDistance}
-                      r="8"
+                      cx={pupilOffsetX}
+                      cy={pupilOffsetY}
+                      r="8.5"
                       fill="#0f172a"
-                      style={{ transition: 'cx 0.05s ease-out, cy 0.05s ease-out' }}
                     />
+                    {/* Top Specular Catchlight */}
                     <circle
-                      cx={Math.cos((lookAngleDeg * Math.PI) / 180) * lookDistance - 2.5}
-                      cy={Math.sin((lookAngleDeg * Math.PI) / 180) * lookDistance - 2.5}
-                      r="2.8"
+                      cx={pupilOffsetX - 2.5}
+                      cy={pupilOffsetY - 2.5}
+                      r="3.2"
                       fill="#ffffff"
-                      style={{ transition: 'cx 0.05s ease-out, cy 0.05s ease-out' }}
+                    />
+                    {/* Secondary Bottom Catchlight */}
+                    <circle
+                      cx={pupilOffsetX + 2.5}
+                      cy={pupilOffsetY + 2.5}
+                      r="1.5"
+                      fill="#ffffff"
                     />
                   </>
                 )}

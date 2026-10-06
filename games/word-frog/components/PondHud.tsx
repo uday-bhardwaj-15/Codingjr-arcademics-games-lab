@@ -79,11 +79,11 @@ export const PondHud: React.FC<PondHudProps> = ({
           title={soundOn ? 'Mute Audio' : 'Unmute Audio'}
           aria-label={soundOn ? 'Mute Audio' : 'Unmute Audio'}
         >
-          {soundOn ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5 text-rose-400" />}
+          {soundOn ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5 text-amber-400" />}
         </button>
       </div>
 
-      {/* 2. Right: HIT, MISS, and RATE Badges (Exact match to Arcademics screenshot) */}
+      {/* 2. Right: HIT, MISS, and RATE Badges */}
       <div className="flex items-center space-x-3 sm:space-x-6">
         {/* HIT Counter */}
         <div className="flex items-center space-x-2 bg-[#0f172a]/90 px-3.5 py-1.5 rounded-md border border-slate-600 shadow-md">

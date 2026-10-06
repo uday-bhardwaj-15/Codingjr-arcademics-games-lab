@@ -34,6 +34,7 @@ export const WordFrogGame: React.FC = () => {
   const [phase, setPhase] = useState<GamePhase>('name');
   const [playerName, setPlayerName] = useState('Player742');
   const [settings, setSettings] = useState<WordFrogSettings>(DEFAULT_SETTINGS);
+  const [showOnboarding, setShowOnboarding] = useState(true); // Interactive tooltip guide on first game
 
   // Load saved profile & settings
   useEffect(() => {
@@ -173,6 +174,7 @@ export const WordFrogGame: React.FC = () => {
   // Handle player clicking / selecting a fly
   const handleSelectFly = useCallback(
     (option: OptionFly, index: number) => {
+      if (showOnboarding) setShowOnboarding(false);
       if (phase !== 'playing' || isWrongLocked || !currentQuestion || frogStatus === 'shooting' || frogStatus === 'retracting') return;
 
       const flyPos = FLY_POSITIONS[index] || { x: 505, y: 245 };
@@ -270,7 +272,7 @@ export const WordFrogGame: React.FC = () => {
         }, 800);
       }
     },
-    [phase, isWrongLocked, currentQuestion, frogStatus, settings.category]
+    [showOnboarding, phase, isWrongLocked, currentQuestion, frogStatus, settings.category]
   );
 
   // Compute live WPM
@@ -359,6 +361,8 @@ export const WordFrogGame: React.FC = () => {
                   eatenFlyIndex={eatenFlyIndex}
                   wrongFlyIndex={wrongFlyIndex}
                   scorePopups={scorePopups}
+                  showOnboarding={showOnboarding}
+                  onDismissOnboarding={() => setShowOnboarding(false)}
                   onSelectFly={handleSelectFly}
                   disabled={phase !== 'playing'}
                 />

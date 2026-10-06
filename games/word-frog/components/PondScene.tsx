@@ -29,6 +29,8 @@ interface PondSceneProps {
   eatenFlyIndex: number | null;
   wrongFlyIndex: number | null;
   scorePopups?: ScorePopup[];
+  showOnboarding?: boolean;
+  onDismissOnboarding?: () => void;
   onSelectFly: (option: OptionFly, index: number) => void;
   disabled?: boolean;
 }
@@ -42,6 +44,8 @@ export const PondScene: React.FC<PondSceneProps> = ({
   eatenFlyIndex,
   wrongFlyIndex,
   scorePopups = [],
+  showOnboarding = false,
+  onDismissOnboarding,
   onSelectFly,
   disabled = false,
 }) => {
@@ -50,13 +54,13 @@ export const PondScene: React.FC<PondSceneProps> = ({
   const [starParticles, setStarParticles] = useState<StarParticle[]>([]);
   const [showKillAura, setShowKillAura] = useState(false);
 
-  // Trigger kid-friendly celebratory screen FX whenever a fly is eaten
+  // Trigger celebratory screen FX whenever a fly is eaten
   useEffect(() => {
     if (frogStatus === 'chewing' && eatenFlyIndex !== null) {
       setShowKillAura(true);
       const flyPos = FLY_POSITIONS[eatenFlyIndex] || { x: 505, y: 240 };
 
-      // Spawn 8 magical celebratory stars bursting outward
+      // Spawn 8 celebratory stars bursting outward (NO RED)
       const chars = ['⭐', '✨', '🌟', '💫', '⚡', '🌟', '✨', '⭐'];
       const newParticles: StarParticle[] = chars.map((char, i) => {
         const angle = (i / chars.length) * Math.PI * 2 + (Math.random() - 0.5);
@@ -101,19 +105,25 @@ export const PondScene: React.FC<PondSceneProps> = ({
 
   const handleFlyClick = useCallback(
     (idx: number) => {
+      if (showOnboarding && onDismissOnboarding) {
+        onDismissOnboarding();
+      }
       if (disabled || isWrongLocked || !question) return;
       const opt = question.options[idx];
       if (!opt) return;
       onSelectFly(opt, idx);
     },
-    [disabled, isWrongLocked, question, onSelectFly]
+    [showOnboarding, onDismissOnboarding, disabled, isWrongLocked, question, onSelectFly]
   );
 
   // Keyboard number keys 1, 2, 3, 4, 5, 6
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (disabled || isWrongLocked || !question) return;
       if (['1', '2', '3', '4', '5', '6'].includes(e.key)) {
+        if (showOnboarding && onDismissOnboarding) {
+          onDismissOnboarding();
+        }
+        if (disabled || isWrongLocked || !question) return;
         const idx = parseInt(e.key, 10) - 1;
         handleFlyClick(idx);
       }
@@ -121,7 +131,11 @@ export const PondScene: React.FC<PondSceneProps> = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [disabled, isWrongLocked, question, handleFlyClick]);
+  }, [showOnboarding, onDismissOnboarding, disabled, isWrongLocked, question, handleFlyClick]);
+
+  // Target fly coordinate for onboarding guidance
+  const targetOptionIndex = question?.options.findIndex((o) => o.isCorrect) ?? 0;
+  const targetFlyPos = FLY_POSITIONS[targetOptionIndex >= 0 ? targetOptionIndex : 0] || { x: 845, y: 260, keyNum: 4 };
 
   return (
     <div
@@ -181,6 +195,14 @@ export const PondScene: React.FC<PondSceneProps> = ({
             opacity: 0;
           }
         }
+        @keyframes guideBannerFade {
+          0% { opacity: 0; transform: translate(-50%, -10px); }
+          100% { opacity: 1; transform: translate(-50%, 0); }
+        }
+        @keyframes pointerBounce {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-8px); }
+        }
         .water-glimmer-anim {
           animation: waterGlimmer 6s ease-in-out infinite alternate;
         }
@@ -200,6 +222,12 @@ export const PondScene: React.FC<PondSceneProps> = ({
         }
         .catch-shockwave-anim {
           animation: catchShockwave 0.5s ease-out forwards;
+        }
+        .guide-banner-anim {
+          animation: guideBannerFade 0.3s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+        }
+        .pointer-bounce-anim {
+          animation: pointerBounce 1.2s ease-in-out infinite;
         }
       `}</style>
 
@@ -222,7 +250,7 @@ export const PondScene: React.FC<PondSceneProps> = ({
         <rect width="100%" height="100%" fill="url(#pondRipples)" />
       </svg>
 
-      {/* 3. Shoreline Reeds & Water Lilies (Swaying ambient nature) */}
+      {/* 3. Shoreline Reeds & Water Lilies */}
       <div className="absolute top-3 left-4 pointer-events-none reed-sway-1 opacity-70">
         <svg viewBox="0 0 80 80" className="w-16 h-16">
           <circle cx="40" cy="40" r="30" fill="#a3e635" opacity="0.45" />
@@ -248,7 +276,7 @@ export const PondScene: React.FC<PondSceneProps> = ({
         </svg>
       </div>
 
-      {/* 4. Screen-Wide Celebratory Catch/Kill Aura Pulse (Emerald & Gold Glow, NO RED) */}
+      {/* 4. Screen-Wide Celebratory Catch/Kill Aura Pulse */}
       {showKillAura && (
         <div
           className="absolute inset-0 pointer-events-none z-30 transition-opacity duration-300"
@@ -275,6 +303,9 @@ export const PondScene: React.FC<PondSceneProps> = ({
         const isThisFlyEaten = eatenFlyIndex === idx;
         const isBeingDragged = frogStatus === 'retracting' && isThisFlyEaten;
         const isWrongHit = wrongFlyIndex === idx;
+        const isTarget = idx === targetOptionIndex;
+        const isHighlighted = showOnboarding && isTarget;
+        const isDull = showOnboarding && !isTarget;
 
         return (
           <Fly
@@ -290,12 +321,14 @@ export const PondScene: React.FC<PondSceneProps> = ({
             mouthPosition={{ x: 505, y: 185 }}
             isWrongHit={isWrongHit}
             isLocked={isWrongLocked || disabled}
+            isHighlighted={isHighlighted}
+            isDull={isDull}
             onClick={() => handleFlyClick(idx)}
           />
         );
       })}
 
-      {/* 7. Celebratory Catch Shockwave Ring & Sparkle Starbursts (NO RED) */}
+      {/* 7. Celebratory Catch Shockwave Ring & Sparkle Starbursts */}
       {eatenFlyIndex !== null && frogStatus === 'chewing' && (
         <div
           className="absolute pointer-events-none z-35 -translate-x-1/2 -translate-y-1/2"
@@ -304,7 +337,6 @@ export const PondScene: React.FC<PondSceneProps> = ({
             top: `${FLY_POSITIONS[eatenFlyIndex]?.y ?? 240}px`,
           }}
         >
-          {/* Water Splash Shockwave Rings */}
           <div className="w-24 h-24 rounded-full border-4 border-cyan-300 catch-shockwave-anim" />
           <div className="w-24 h-24 rounded-full border-2 border-amber-300 catch-shockwave-anim" style={{ animationDelay: '0.1s' }} />
         </div>
@@ -328,7 +360,7 @@ export const PondScene: React.FC<PondSceneProps> = ({
         </div>
       ))}
 
-      {/* 8. Floating Score Popups (Gold & Emerald) */}
+      {/* 8. Floating Score Popups */}
       {scorePopups.map((popup) => (
         <div
           key={popup.id}
@@ -339,6 +371,29 @@ export const PondScene: React.FC<PondSceneProps> = ({
           <span className="text-xl">✨</span>
         </div>
       ))}
+
+      {/* 9. Clean, Non-Intrusive Onboarding Top Banner */}
+      {showOnboarding && !disabled && (
+        <div
+          className="absolute top-4 left-1/2 -translate-x-1/2 z-45 guide-banner-anim flex items-center gap-3 px-5 py-2.5 rounded-2xl bg-slate-900/90 backdrop-blur-md border-2 border-amber-300 text-white shadow-2xl pointer-events-auto"
+        >
+          <span className="text-xl">🎯</span>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2">
+            <span className="text-xs sm:text-sm font-black text-amber-200">
+              Find the <span className="text-white uppercase underline decoration-amber-400">{question?.categoryLabel || 'Antonym'}</span> of &ldquo;{question?.prompt}&rdquo;!
+            </span>
+            <span className="text-[11px] text-slate-300 font-bold">
+              (Press key <strong className="text-amber-300 font-black">[{targetFlyPos.keyNum}]</strong> or click the glowing option)
+            </span>
+          </div>
+          <button
+            onClick={onDismissOnboarding}
+            className="ml-2 px-2.5 py-1 rounded-lg bg-white/15 hover:bg-amber-400 hover:text-slate-950 text-amber-200 text-xs font-black transition-all cursor-pointer"
+          >
+            Got it ✕
+          </button>
+        </div>
+      )}
     </div>
   );
 };
