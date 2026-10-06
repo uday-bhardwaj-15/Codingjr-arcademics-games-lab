@@ -97,7 +97,7 @@ export const PondHud: React.FC<PondHudProps> = ({
 
         {/* MISS Counter */}
         <div className="flex items-center space-x-2 bg-[#0f172a]/90 px-3.5 py-1.5 rounded-md border border-slate-600 shadow-md">
-          <span className="text-xs font-black uppercase tracking-wider text-rose-400">
+          <span className="text-xs font-black uppercase tracking-wider text-amber-400">
             MISS
           </span>
           <span className="text-lg font-black text-white font-mono min-w-[20px] text-right">

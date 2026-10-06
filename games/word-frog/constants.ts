@@ -8,14 +8,14 @@ export const DEFAULT_SETTINGS: WordFrogSettings = {
 };
 
 // 6 Fly Spawn Coordinates centered around the frog (GameWindow 1010 x 577)
-// Center Frog is at (505, 245), Bottom HUD is at (0, 505) to (1010, 577)
+// Center Frog is at (505, 240), Bottom HUD is at (0, 505) to (1010, 577)
 export const FLY_POSITIONS: Array<{ x: number; y: number; keyNum: number }> = [
-  { x: 220, y: 95, keyNum: 1 },  // 0: Top-Left
-  { x: 790, y: 95, keyNum: 2 },  // 1: Top-Right
-  { x: 160, y: 245, keyNum: 3 }, // 2: Mid-Left
-  { x: 850, y: 245, keyNum: 4 }, // 3: Mid-Right
-  { x: 250, y: 405, keyNum: 5 }, // 4: Bottom-Left
-  { x: 760, y: 405, keyNum: 6 }, // 5: Bottom-Right
+  { x: 235, y: 125, keyNum: 1 }, // 0: Top-Left (safely below top bar)
+  { x: 775, y: 125, keyNum: 2 }, // 1: Top-Right (safely below top bar)
+  { x: 165, y: 260, keyNum: 3 }, // 2: Mid-Left
+  { x: 845, y: 260, keyNum: 4 }, // 3: Mid-Right
+  { x: 250, y: 395, keyNum: 5 }, // 4: Bottom-Left
+  { x: 760, y: 395, keyNum: 6 }, // 5: Bottom-Right
 ];
 
 // Rich Curated Vocabulary Database

@@ -23,6 +23,13 @@ import { ResultsScreen } from './screens/ResultsScreen';
 
 type GamePhase = 'name' | 'options' | 'lobby' | 'countdown' | 'playing' | 'results';
 
+interface ScorePopup {
+  id: number;
+  text: string;
+  x: number;
+  y: number;
+}
+
 export const WordFrogGame: React.FC = () => {
   const [phase, setPhase] = useState<GamePhase>('name');
   const [playerName, setPlayerName] = useState('Player742');
@@ -51,9 +58,10 @@ export const WordFrogGame: React.FC = () => {
   const [timeLeft, setTimeLeft] = useState(60);
   const [isWrongLocked, setIsWrongLocked] = useState(false);
   const [countdownText, setCountdownText] = useState('');
+  const [scorePopups, setScorePopups] = useState<ScorePopup[]>([]);
 
   // Frog Animation & Tongue Lash States
-  const [frogStatus, setFrogStatus] = useState<'idle' | 'shooting' | 'chewing' | 'miss'>('idle');
+  const [frogStatus, setFrogStatus] = useState<'idle' | 'shooting' | 'retracting' | 'chewing' | 'miss'>('idle');
   const [targetPosition, setTargetPosition] = useState<{ x: number; y: number } | null>(null);
   const [tongueProgress, setTongueProgress] = useState(0);
   const [eatenFlyIndex, setEatenFlyIndex] = useState<number | null>(null);
@@ -116,6 +124,7 @@ export const WordFrogGame: React.FC = () => {
     setEatenFlyIndex(null);
     setWrongFlyIndex(null);
     setIsWrongLocked(false);
+    setScorePopups([]);
 
     const q1 = generateFrogQuestion(settings.category);
     setCurrentQuestion(q1);
@@ -164,7 +173,7 @@ export const WordFrogGame: React.FC = () => {
   // Handle player clicking / selecting a fly
   const handleSelectFly = useCallback(
     (option: OptionFly, index: number) => {
-      if (phase !== 'playing' || isWrongLocked || !currentQuestion) return;
+      if (phase !== 'playing' || isWrongLocked || !currentQuestion || frogStatus === 'shooting' || frogStatus === 'retracting') return;
 
       const flyPos = FLY_POSITIONS[index] || { x: 505, y: 245 };
       setTargetPosition(flyPos);
@@ -173,46 +182,63 @@ export const WordFrogGame: React.FC = () => {
         soundManager.playCorrect();
         setHits((h) => h + 1);
 
-        // 1. Shoot Tongue animation forward (110ms)
+        // 1. Shoot Tongue outward with smooth cubic ease-out (~120ms)
         setFrogStatus('shooting');
         setTongueProgress(0);
 
         let shootStart: number | null = null;
-        const shootDur = 110;
+        const shootDur = 120;
 
         const shootOut = (now: number) => {
           if (!shootStart) shootStart = now;
-          const progress = Math.min(1, (now - shootStart) / shootDur);
-          setTongueProgress(progress);
+          const rawLinear = Math.min(1, (now - shootStart) / shootDur);
+          // Cubic ease-out: starts ultra-fast, snaps precisely to fly
+          const easedProgress = 1 - Math.pow(1 - rawLinear, 3);
+          setTongueProgress(easedProgress);
 
-          if (progress < 1) {
+          if (rawLinear < 1) {
             animFrameRef.current = requestAnimationFrame(shootOut);
           } else {
-            // Reached fly: mark eaten & retract tongue back to mouth (90ms)
+            // Reached fly: mark eaten & retract tongue back to mouth (~100ms) with quadratic ease-in
             setEatenFlyIndex(index);
+            setFrogStatus('retracting');
 
             let retractStart: number | null = null;
-            const retractDur = 90;
+            const retractDur = 100;
 
             const snapBack = (retractNow: number) => {
               if (!retractStart) retractStart = retractNow;
-              const rProgress = Math.max(0, 1 - (retractNow - retractStart) / retractDur);
+              const rLinear = Math.min(1, (retractNow - retractStart) / retractDur);
+              // Quadratic ease-in: starts gentle and accelerates into mouth
+              const rProgress = Math.max(0, 1 - Math.pow(rLinear, 2));
               setTongueProgress(rProgress);
 
-              if (rProgress > 0) {
+              if (rLinear < 1) {
                 animFrameRef.current = requestAnimationFrame(snapBack);
               } else {
-                // Fully retracted: frog chews
+                // Fully retracted: spawn score popup & frog chews
                 setFrogStatus('chewing');
                 setTongueProgress(0);
                 setTargetPosition(null);
+
+                // Add floating popup
+                const newPopup: ScorePopup = {
+                  id: Date.now() + Math.random(),
+                  text: '+100',
+                  x: 505,
+                  y: 160,
+                };
+                setScorePopups((prev) => [...prev, newPopup]);
+                setTimeout(() => {
+                  setScorePopups((prev) => prev.filter((p) => p.id !== newPopup.id));
+                }, 850);
 
                 setTimeout(() => {
                   setFrogStatus('idle');
                   setEatenFlyIndex(null);
                   const nextQ = generateFrogQuestion(settings.category, currentQuestion.prompt);
                   setCurrentQuestion(nextQ);
-                }, 350);
+                }, 320);
               }
             };
 
@@ -235,16 +261,16 @@ export const WordFrogGame: React.FC = () => {
           category: currentQuestion.categoryLabel,
         });
 
-        // 1.0s Wrong Lockout shake
+        // 0.8s Wrong Lockout shake
         setTimeout(() => {
           setIsWrongLocked(false);
           setWrongFlyIndex(null);
           setFrogStatus('idle');
           setTargetPosition(null);
-        }, 1000);
+        }, 800);
       }
     },
-    [phase, isWrongLocked, currentQuestion, settings.category]
+    [phase, isWrongLocked, currentQuestion, frogStatus, settings.category]
   );
 
   // Compute live WPM
@@ -332,6 +358,7 @@ export const WordFrogGame: React.FC = () => {
                   isWrongLocked={isWrongLocked}
                   eatenFlyIndex={eatenFlyIndex}
                   wrongFlyIndex={wrongFlyIndex}
+                  scorePopups={scorePopups}
                   onSelectFly={handleSelectFly}
                   disabled={phase !== 'playing'}
                 />
